@@ -1168,7 +1168,32 @@ document.getElementById('exch-grams').addEventListener('input', renderExchange);
 
 render();
 initScrollReveal();
-initCloudSync();
+initCloudSync();/* ======================= FIREBASE REALTIME SYNC ======================= */
+const firebaseConfig = {
+  databaseURL: "https://achilles-b0e4e-default-rtdb.firebaseio.com"
+};
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+const db = firebase.database();
+
+// 1. استلام التغييرات من أي جهاز آخر وتحديث الصفحة
+db.ref("store").on("value", (snapshot) => {
+  const data = snapshot.val();
+  if (data) {
+    Object.assign(store, data);
+    localStorage.setItem("achilles_store", JSON.stringify(store));
+    render();
+  }
+});
+
+// 2. تحديث دالة الحفظ لترسل للفايربيس فوراً
+const originalSaveStore = window.saveStore;
+window.saveStore = function() {
+  if (typeof originalSaveStore === 'function') originalSaveStore();
+  db.ref("store").set(store);
+};
 </script>
 </body>
 </html>
