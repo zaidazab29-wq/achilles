@@ -1,0 +1,13 @@
+{
+  "name": "acro-push-notifications",
+  "version": "1.0.0",
+  "description": "Sends ACRO's 3 daily reminder push notifications via GitHub Actions cron",
+  "main": "send-notifications.js",
+  "scripts": {
+    "send": "node send-notifications.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.0.0",
+    "web-push": "^3.6.7"
+  }
+}
