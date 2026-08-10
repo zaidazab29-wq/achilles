@@ -1,0 +1,30 @@
+name: ACRO Daily Reminders
+
+on:
+  schedule:
+    # كل 15 دقيقة، على مدار اليوم كله. المواعيد الفعلية (3 العصر / 9 بالليل /
+    # بعد نص الليل بتوقيت القاهرة) بيتحسبوا جوه السكريبت نفسه، مش هنا —
+    # عشان كده مش محتاجين نعدّل الملف ده لما توقيت مصر الصيفي/الشتوي يتغيّر.
+    - cron: '*/15 * * * *'
+  workflow_dispatch: {} # بيدّيك زرار "Run workflow" يدوي من تاب Actions، للتجربة
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: notifications
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - run: npm install
+
+      - run: node send-notifications.js
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
