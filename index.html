@@ -1833,12 +1833,19 @@ function openLolaChat(){
 function closeLolaChat(){
   document.getElementById('lola-chat-overlay').classList.remove('show');
 }
-document.getElementById('lola-fab').addEventListener('click', openLolaChat);
-document.getElementById('lola-chat-close').addEventListener('click', closeLolaChat);
-document.getElementById('lola-chat-overlay').addEventListener('click', e=>{
-  if(e.target.id === 'lola-chat-overlay') closeLolaChat();
-});
+// ربط الأحداث بأمان عشان الكود ماينهارش لو عنصر مش موجود
+const fabBtn = document.getElementById('lola-fab') || document.querySelector('.lola-fab') || document.getElementById('lola-chat-btn');
+if (fabBtn) fabBtn.addEventListener('click', openLolaChat);
 
+const closeBtn = document.getElementById('lola-chat-close');
+if (closeBtn) closeBtn.addEventListener('click', closeLolaChat);
+
+const overlayEl = document.getElementById('lola-chat-overlay');
+if (overlayEl) {
+  overlayEl.addEventListener('click', e => {
+    if (e.target.id === 'lola-chat-overlay') closeLolaChat();
+  });
+}
 function appendChatBubble(role, text){
   const box = document.getElementById('lola-chat-messages');
   const el = document.createElement('div');
