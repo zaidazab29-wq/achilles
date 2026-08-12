@@ -1,0 +1,13 @@
+{
+  "name": "lola-push-notifications",
+  "version": "1.0.0",
+  "description": "Sends Lola's daily reminder push notifications (meals + water) via GitHub Actions cron",
+  "main": "send-notifications.js",
+  "scripts": {
+    "send": "node send-notifications.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.0.0",
+    "web-push": "^3.6.7"
+  }
+}
