@@ -59,8 +59,10 @@ function buildGymReminders(store){
 const REMINDERS = [
   { id: 'breakfast',     hour: 15, minute: 0, title: 'Lola — الفطار 🍳',      body: 'سجّلت فطارك النهاردة؟ افتح Lola وحدّث بناء الوجبات.' },
   { id: 'dinner_meds',   hour: 1,  minute: 0, title: 'Lola — العشا والدوا 💊',  body: 'قبل ما تنام: سجّلت العشا وأخدت الدوا؟' },
+  { id: 'teeth_morning', hour: 2,  minute: 30, title: 'Lola — صباح نظيف ✨',    body: 'فرشاة أسنان سريعة — ابتسامة بتشكرك الصبح كله!' },
   { id: 'water_1',       hour: 10, minute: 0, title: 'Lola — ميه 💧',          body: 'وقت كوباية ميه — متنساش تشرب.' },
   { id: 'water_2',       hour: 13, minute: 0, title: 'Lola — ميه 💧',          body: 'كوباية ميه دلوقتي كويسة.' },
+  { id: 'teeth_evening', hour: 14, minute: 30, title: 'Lola — نظافة وسعادة 🪥', body: 'وقت فرشاة الأسنان — أسنانك محتاجة الحب ده.' },
   { id: 'water_3',       hour: 17, minute: 0, title: 'Lola — ميه 💧',          body: 'فاكر تشرب ميه؟ خد كوباية.' },
   { id: 'water_4',       hour: 20, minute: 0, title: 'Lola — ميه 💧',          body: 'كوباية ميه قبل العشا.' }
 ];
