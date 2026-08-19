@@ -12,15 +12,6 @@
 <meta name="apple-mobile-web-app-title" content="Lola">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=Playfair+Display:ital,wght@1,500;1,600;1,700&display=swap" rel="stylesheet">
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
-    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/",
-    "@pixiv/three-vrm": "https://cdn.jsdelivr.net/npm/@pixiv/three-vrm@3/lib/three-vrm.module.min.js"
-  }
-}
-</script>
 <style>
 :root{
   --black:#0A0A0A;
@@ -82,6 +73,9 @@ button{font-family:inherit;}
 
 .wrap{position:relative;z-index:1;max-width:1040px;margin:0 auto;padding:0 20px 90px;}
 
+/* All three bars below stack as ONE sticky unit, so whatever height each
+   bar actually renders at (e.g. macro banner wrapping to 2 lines on a
+   narrow phone) is handled automatically — no more guessing pixel offsets. */
 .header-stack{position:sticky;top:0;z-index:60;}
 
 /* ================= TOP BAR ================= */
@@ -190,6 +184,7 @@ h1{font-size:20px;margin:6px 0 4px;font-weight:700;letter-spacing:-.01em;}
 @keyframes cardRise{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
 @media (prefers-reduced-motion:reduce){.panel.active section{animation:none;}}
 
+/* scroll-reveal (applies to header + sections observed on first paint of a tab / initial load) */
 .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s var(--ease),transform .7s var(--ease);}
 .reveal.in{opacity:1;transform:translateY(0);}
 @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none;}}
@@ -204,6 +199,8 @@ section{margin-top:20px;position:relative;}
   padding:17px;box-shadow:0 20px 40px -28px rgba(2,16,36,.7),inset 0 1px 0 rgba(255,255,255,.05);
   isolation:isolate;transition:border-color .35s,box-shadow .35s;
 }
+/* ---- glass edge: a soft gradient "border" traced with a masked pseudo-element,
+   the same technique real liquid-glass UIs use instead of a flat solid border ---- */
 .card::after{
   content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;
   background:linear-gradient(152deg, rgba(193,232,255,.38) 0%, rgba(193,232,255,.06) 22%, rgba(193,232,255,0) 45%, rgba(193,232,255,0) 62%, rgba(84,131,179,.22) 100%);
@@ -213,6 +210,7 @@ section{margin-top:20px;position:relative;}
 }
 .card:hover::after{opacity:1;}
 
+/* ---- under-glow (the "glowing" layer requested: a soft light sitting beneath every panel) ---- */
 .card::before{
   content:"";position:absolute;left:8%;right:8%;bottom:-22px;height:44px;z-index:-1;
   background:radial-gradient(ellipse at center, rgba(84,131,179,.5), rgba(193,232,255,.22) 40%, transparent 72%);
@@ -280,6 +278,9 @@ header.chart::after{
 .habit-progress{margin-top:10px;height:4px;border-radius:99px;background:rgba(125,160,202,.15);overflow:hidden;}
 .habit-progress i{display:block;height:100%;background:linear-gradient(90deg,var(--blue-mid),var(--ice));border-radius:99px;transition:width .4s var(--ease);}
 
+/* ---- rich habit cards (تمرين الجيم / DNR): 3-4 حالات صريحة بدل صح/غلط بس ----
+   gs-unlogged لازم تبقى أضعف حاجة بصريًا في الشبكة كلها — عمدًا، عشان
+   تبان "يوم فاضي" على طول من غير ما تقرا النص. */
 .habit-history-btn{background:rgba(193,232,255,.08);border:1px solid var(--line-strong);color:var(--ice);width:28px;height:28px;border-radius:50%;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;}
 .habit-history-btn:hover{border-color:var(--ice);background:rgba(193,232,255,.18);transform:scale(1.06);}
 .habit-rich .habit-glow{background:linear-gradient(140deg,var(--line-strong),var(--line));opacity:.25;}
@@ -293,6 +294,12 @@ header.chart::after{
 .habit-rich.gs-unlogged .habit-glow{opacity:.1;}
 .habit-rich.gs-unlogged .habit-fg{background:linear-gradient(140deg,rgba(125,160,202,.16),rgba(193,232,255,.03));border:1px dashed rgba(125,160,202,.25);}
 
+/* ---- Habit History modal (bottom sheet) ----
+   Sheet motion follows Apple's own drawer/sheet value (damping ~0.8 —
+   a small overshoot, since a sheet is a physical object being "placed"),
+   opposed to a flat fade. Closing has no overshoot (settling back down
+   shouldn't bounce). Nothing here blocks input mid-transition — toggling
+   .show is instant and the tap handlers work immediately either way. */
 .hm-overlay{position:fixed;inset:0;z-index:200;background:rgba(2,8,18,.72);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .28s var(--ease);}
 .hm-overlay.show{opacity:1;pointer-events:auto;}
 .hm-panel{width:100%;max-width:640px;max-height:88vh;overflow-y:auto;background:linear-gradient(180deg,var(--panel),var(--deep));border:1px solid var(--line-strong);border-radius:26px 26px 0 0;padding:20px 18px 30px;transform:translateY(36px);transition:transform .38s cubic-bezier(.34,1.32,.4,1);box-shadow:0 -20px 60px -20px rgba(0,0,0,.7);}
@@ -378,15 +385,18 @@ select{font-family:var(--font-display);}
 .chip.soda{border-color:var(--crimson);}
 .chip.soda.selected{border-color:var(--crimson);color:#FF6B87;background:rgba(220,20,60,.1);box-shadow:0 0 0 1px rgba(220,20,60,.2),0 0 18px rgba(220,20,60,.15);}
 
+/* --- reset-day button (بدون) --- */
 .reset-day-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;background:rgba(220,20,60,.06);border:1px dashed var(--crimson);color:#FF6B87;border-radius:12px;padding:11px 14px;font-size:13px;font-weight:600;font-family:var(--font-display);cursor:pointer;margin-bottom:20px;transition:all .2s;}
 .reset-day-btn:hover{background:rgba(220,20,60,.13);border-color:#FF6B87;}
 .reset-day-btn:active{transform:scale(.97);}
 
+/* --- portion selector (attached to protein chips) --- */
 .chip{position:relative;}
 .portion-select{display:block;width:100%;margin-top:6px;background:rgba(2,16,36,.55);border:1px solid var(--line);color:var(--sub);border-radius:6px;padding:3px 4px;font-family:var(--font-mono);font-size:10px;cursor:pointer;}
 .portion-select:focus{outline:none;border-color:var(--ice);}
 .chip.selected .portion-select{color:var(--ice);border-color:rgba(193,232,255,.3);}
 
+/* --- custom (manual-calorie) item entry per meal --- */
 .custom-item-block{margin-top:10px;}
 .custom-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;}
 .custom-chip{display:flex;align-items:center;gap:8px;border:1px solid rgba(193,232,255,.4);color:var(--ice);background:linear-gradient(160deg, rgba(193,232,255,.14), rgba(193,232,255,.04));box-shadow:0 0 0 1px rgba(193,232,255,.15),inset 0 1px 0 rgba(255,255,255,.12);padding:7px 10px;border-radius:999px;font-size:12px;}
@@ -508,82 +518,6 @@ footer{color:var(--sub);font-size:12px;text-align:center;margin-top:34px;}
 
 .save-toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%) translateY(120%);background:var(--panel-2);border:1px solid var(--line-strong);color:var(--ice);font-family:var(--font-mono);font-size:12px;padding:9px 18px;border-radius:999px;z-index:100;transition:transform .4s var(--ease);pointer-events:none;}
 .save-toast.show{transform:translateX(-50%) translateY(0);}
-
-/* ================= LOLA AVATAR BUBBLE + CHAT SHEET ================= */
-.lola-fab{position:fixed;left:16px;bottom:16px;z-index:150;width:56px;height:56px;border-radius:50%;
-  border:1px solid rgba(193,232,255,.28);cursor:pointer;
-  background:linear-gradient(160deg,var(--blue-mid),var(--panel) 130%);
-  box-shadow:0 14px 30px -10px rgba(2,16,36,.85),inset 0 1px 0 rgba(255,255,255,.18);
-  display:flex;align-items:center;justify-content:center;overflow:hidden;
-  transition:transform .25s var(--ease),box-shadow .25s;}
-.lola-fab::before{content:"";position:absolute;inset:-6px;border-radius:50%;background:radial-gradient(circle,rgba(193,232,255,.35),transparent 70%);filter:blur(10px);opacity:.5;animation:lolaFabBreathe 4.2s ease-in-out infinite;pointer-events:none;z-index:-1;}
-@keyframes lolaFabBreathe{0%,100%{opacity:.35;transform:scale(1);}50%{opacity:.6;transform:scale(1.12);}}
-@media (prefers-reduced-motion:reduce){.lola-fab::before{animation:none;}}
-.lola-fab:hover{transform:translateY(-2px) scale(1.04);}
-.lola-fab:active{transform:scale(.94);}
-.lola-fab img,.lola-fab svg{width:60%;height:60%;object-fit:contain;}
-.lola-fab .fab-ring{position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--crimson);opacity:0;pointer-events:none;}
-.lola-fab.attention .fab-ring{opacity:.85;animation:fabPulse 1.8s ease-out infinite;}
-@keyframes fabPulse{0%{transform:scale(.9);opacity:.9;}100%{transform:scale(1.35);opacity:0;}}
-@media (prefers-reduced-motion:reduce){.lola-fab.attention .fab-ring{animation:none;opacity:.5;}}
-
-.lola-overlay{position:fixed;inset:0;z-index:210;background:rgba(2,8,18,.72);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
-  display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .28s var(--ease);}
-.lola-overlay.show{opacity:1;pointer-events:auto;}
-.lola-panel{width:100%;max-width:440px;height:min(86vh,720px);display:flex;flex-direction:column;overflow:hidden;
-  background:linear-gradient(180deg,var(--panel),var(--deep));border:1px solid var(--line-strong);
-  border-radius:26px 26px 0 0;transform:translateY(36px);transition:transform .38s cubic-bezier(.34,1.32,.4,1);
-  box-shadow:0 -20px 60px -20px rgba(0,0,0,.7);}
-.lola-overlay.show .lola-panel{transform:translateY(0);}
-@media (min-width:680px){.lola-overlay{align-items:center;}.lola-panel{border-radius:26px;}}
-@media (prefers-reduced-motion:reduce){.lola-overlay,.lola-panel{transition:opacity .2s ease;}.lola-panel{transform:none !important;}}
-
-.lola-viewport{position:relative;height:230px;flex-shrink:0;border-bottom:1px solid var(--line);
-  background:radial-gradient(120% 100% at 50% 20%,rgba(84,131,179,.22) 0%,var(--deep) 75%);overflow:hidden;}
-.lola-viewport canvas{display:block;width:100%;height:100%;}
-.lola-canvas-mount{position:absolute;inset:0;z-index:0;}
-.lola-aura{position:absolute;inset:0;background:radial-gradient(circle at 50% 35%,rgba(193,232,255,.28) 0%,transparent 55%);
-  opacity:.4;pointer-events:none;transition:opacity .6s var(--ease),background .6s var(--ease);z-index:1;}
-[data-lola-state="support"] .lola-aura{background:radial-gradient(circle at 50% 35%,rgba(220,20,60,.25) 0%,transparent 55%);opacity:.5;}
-[data-lola-state="playful"] .lola-aura,[data-lola-state="focus"] .lola-aura{opacity:.6;}
-[data-lola-talking="true"] .lola-aura{animation:lolaTalkPulse 1.1s ease-in-out infinite;}
-@keyframes lolaTalkPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
-@media (prefers-reduced-motion:reduce){[data-lola-talking="true"] .lola-aura{animation:none;}}
-.lola-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--sub);font-family:var(--font-mono);z-index:2;}
-.lola-nametag{position:absolute;bottom:10px;right:14px;display:flex;align-items:center;gap:6px;
-  background:rgba(4,22,47,.7);padding:5px 10px;border-radius:20px;font-size:12px;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
-  border:1px solid var(--line-strong);z-index:2;}
-.lola-status-dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 6px var(--ok);flex-shrink:0;transition:background .3s,box-shadow .3s;}
-[data-lola-state="support"] .lola-status-dot{background:var(--blue-light);box-shadow:0 0 6px var(--blue-light);}
-[data-lola-state="playful"] .lola-status-dot{background:var(--crimson);box-shadow:0 0 6px var(--crimson);}
-.lola-close{position:absolute;top:10px;left:10px;background:rgba(4,22,47,.6);border:1px solid var(--line-strong);color:var(--sub);
-  width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:14px;z-index:2;transition:transform .15s var(--ease),color .25s,border-color .25s;}
-.lola-close:hover{color:var(--paper);border-color:var(--ice);}
-.lola-close:active{transform:scale(.9);}
-.lola-fx-layer{position:absolute;inset:0;pointer-events:none;overflow:visible;z-index:2;}
-.lola-fx-item{position:absolute;top:20%;font-size:20px;opacity:0;animation:lolaFloatUp 2.4s var(--ease) forwards;}
-@keyframes lolaFloatUp{0%{opacity:0;transform:translateY(0) scale(.6);}15%{opacity:1;}100%{opacity:0;transform:translateY(-90px) scale(1.1);}}
-
-.lola-chat-log{flex:1;overflow-y:auto;padding:16px 14px;display:flex;flex-direction:column;gap:10px;}
-.lola-msg{max-width:80%;padding:10px 14px;border-radius:16px;font-size:13.5px;line-height:1.6;animation:lolaMsgIn .3s var(--ease);}
-@keyframes lolaMsgIn{from{opacity:0;transform:translateY(6px) scale(.98);}to{opacity:1;transform:translateY(0) scale(1);}}
-.lola-msg.bot{align-self:flex-start;background:var(--panel-2);border:1px solid var(--line);border-bottom-left-radius:4px;color:var(--paper);}
-.lola-msg.user{align-self:flex-end;background:linear-gradient(135deg,var(--navy-light),var(--navy));border:1px solid var(--line);
-  border-bottom-right-radius:4px;color:var(--paper);}
-.lola-typing-row{align-self:flex-start;display:flex;gap:4px;padding:10px 14px;}
-.lola-typing-row span{width:6px;height:6px;border-radius:50%;background:var(--sub);animation:lolaBounce 1.2s infinite;}
-.lola-typing-row span:nth-child(2){animation-delay:.15s;}
-.lola-typing-row span:nth-child(3){animation-delay:.3s;}
-@keyframes lolaBounce{0%,60%,100%{transform:translateY(0);opacity:.4;}30%{transform:translateY(-4px);opacity:1;}}
-
-.lola-input-row{display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--line);background:var(--panel-2);flex-shrink:0;}
-.lola-input-row input{flex:1;background:var(--deep);border:1px solid var(--line);color:var(--paper);padding:11px 14px;
-  border-radius:12px;font-size:14px;outline:none;transition:border-color .2s var(--ease);font-family:var(--font-display);}
-.lola-input-row input:focus{border-color:var(--ice);}
-.lola-input-row button{background:var(--ice);border:none;color:var(--deep);width:42px;height:42px;border-radius:12px;
-  font-size:16px;cursor:pointer;flex-shrink:0;transition:transform .15s var(--ease);}
-.lola-input-row button:active{transform:scale(.9);}
-.lola-input-row button:disabled{opacity:.45;cursor:default;}
 </style>
 <script type="module">
   // Import the functions you need from the SDKs you need
@@ -630,14 +564,6 @@ footer{color:var(--sub);font-size:12px;text-align:center;margin-top:34px;}
   // below). Anonymous sign-in only exists so Firestore's security rules
   // have an authenticated request to check against — it doesn't gate access
   // to any particular person's data.
-</script>
-<script type="module">
-  // موديول صغير مهمته الوحيدة: يستورد من vrm-avatar.js ويحطهم على window
-  // عشان الكود العادي (classic script) تحت يقدر يستخدمهم عادي. منفصل عن
-  // vrm-avatar.js نفسه (زي firebase-bundle.js بالظبط) عشان المتصفح يكاشيه
-  // لوحده من غير ما يعيد تحميله كل مرة تتعدل فيها index.html.
-  import { initAvatar, setAvatarState, setTalking, destroyAvatar } from './vrm-avatar.js';
-  window.LolaAvatar = { initAvatar, setAvatarState, setTalking, destroyAvatar };
 </script>
 </head>
 <body>
@@ -1089,32 +1015,6 @@ footer{color:var(--sub);font-size:12px;text-align:center;margin-top:34px;}
   </div>
 </div>
 
-<!-- فقاعة لولا العائمة — بتفتح شيت فيه الأفاتار ثلاثي الأبعاد + الشات -->
-<button type="button" class="lola-fab" id="lola-fab" title="اتكلم مع لولا" aria-label="افتح شات لولا">
-  <svg viewBox="0 0 40 40" width="26" height="26" aria-hidden="true">
-    <path d="M18 3 C18.9 10.5 21.5 16.5 28 18 C21.5 19.5 18.9 25.5 18 33 C17.1 25.5 14.5 19.5 8 18 C14.5 16.5 17.1 10.5 18 3 Z" fill="var(--ice)"/>
-  </svg>
-  <div class="fab-ring"></div>
-</button>
-
-<div class="lola-overlay" id="lola-overlay">
-  <div class="lola-panel" data-lola-state="idle" data-lola-talking="false" id="lola-panel">
-    <div class="lola-viewport" id="lola-viewport">
-      <div class="lola-canvas-mount" id="lola-canvas-mount"></div>
-      <div class="lola-aura"></div>
-      <div class="lola-loading" id="lola-loading">بتحمّل لولا...</div>
-      <div class="lola-fx-layer" id="lola-fx-layer"></div>
-      <div class="lola-nametag"><span class="lola-status-dot"></span> لولا</div>
-      <button type="button" class="lola-close" id="lola-close" aria-label="إغلاق">✕</button>
-    </div>
-    <div class="lola-chat-log" id="lola-chat-log"></div>
-    <div class="lola-input-row">
-      <input type="text" id="lola-msg-input" placeholder="قول للولا إيه اللي عملته...">
-      <button type="button" id="lola-send-btn">➤</button>
-    </div>
-  </div>
-</div>
-
 <script>
 /* ======================= STORAGE ======================= */
 const STORE_KEY = 'nadir_dashboard_v1';
@@ -1129,6 +1029,9 @@ function loadLocalStore(){
   }catch(e){ return {}; }
 }
 
+// Saves are debounced and written to both localStorage (instant, offline-safe)
+// and Firestore (cross-device). A toast fires on the instant local write;
+// the cloud write happens ~600ms after the user stops interacting.
 let cloudSaveTimer;
 function saveStore(){
   try{ localStorage.setItem(STORE_KEY, JSON.stringify(store)); }catch(e){ /* storage unavailable */ }
@@ -1159,13 +1062,27 @@ function flashSaved(synced){
 let store = {
   weight:95, age:20, activity:1.35, phase:1,
   selections:{}, toggles:{},
-  customItems:{},
-  portions:{},
+  customItems:{}, // { breakfast:[{id,label,k,p,f,c}], lunch:[...], dinner:[...] } — أصناف بسعرات مكتوبة يدويًا
+  portions:{},    // { groupName: { chipIdx: fraction } } — الكمية المختارة لكل صنف رئيسي (¼/½/¾/كامل/...)
+  // { 'YYYY-MM-DD': {calories:bool, water:bool, cardio:bool, dnr:'done'|'skipped'|undefined} }
+  // ملحوظة: "training" اتشالت من هنا — عادة الجيم بقت بتتحسب أوتوماتيك من
+  // store.gym.dailyLog بدل ما تتسجل يدوي هنا (شوف تعليق gym تحت). و"dnr"
+  // بقت نص (string) مش boolean: 'done' / 'skipped' / مش موجودة خالص =
+  // "معملتش حاجة النهاردة" — دي حالة مختلفة عن "done"/"skipped" بالذات
+  // ومهم تتفرق عنهم في كل الحسابات (مش نفس معنى false القديمة).
   habitLog:{},
   shopping:{},
-  gym:{ day:'push', sets:{}, stretchDone:{}, dailyLog:{} }
+  // dailyLog: { 'YYYY-MM-DD': 'done'|'skipped'|'rest' } — سجل حضور الجيم
+  // بتاريخ حقيقي، منفصل عن "day" اللي هو مؤشر الروتيشن (push/pull/legs/...).
+  // بيتسجل تلقائي أول ما تدوس "خلصت التمرين" أو "مش هلعب النهاردة" في تاب
+  // الجيم — يوم من غير أي ضغطة = مسجلش خالص (مش "راحة" ومش "متخطي"،
+  // فرق مقصود عشان نقدر نحسب معدل الالتزام صح).
+  gym:{ day:'push', sets:{}, stretchDone:{}, dailyLog:{} } // sets: { 'day::Exercise Name': [{reps,kg,rpe,done}] }
 };
 
+// Loads local cache immediately (so a returning visitor sees data with zero
+// latency), then reconciles with Firestore once anonymous auth resolves.
+// Firestore is treated as the source of truth when it's reachable.
 async function initStore(){
   Object.assign(store, loadLocalStore());
 
@@ -1175,6 +1092,11 @@ async function initStore(){
     return;
   }
   const { db, doc, getDoc } = window.firebaseDB;
+  // IMPORTANT: this app intentionally uses ONE FIXED shared document
+  // ('shared/nadir_dashboard_v1') instead of a per-uid path, so every device
+  // that opens the page — with no login, no password — reads and writes the
+  // exact same data. That means anyone who has the URL can view AND edit it.
+  // This is a deliberate trade-off for zero-friction cross-device sync.
   firestoreDocRef = doc(db, 'shared', STORE_KEY);
   firestoreOK = true;
 
@@ -1183,6 +1105,7 @@ async function initStore(){
     if(snap.exists()){
       Object.assign(store, snap.data());
     } else {
+      // first time this shared doc is seen — seed Firestore with whatever we have locally
       await window.firebaseDB.setDoc(firestoreDocRef, store);
     }
   }catch(e){
@@ -1193,11 +1116,16 @@ async function initStore(){
   attachRealtimeListener();
 }
 
+// Live cross-device sync: any write from ANY device (any tab/phone/tablet)
+// signed into the same account pushes here within ~1s, no refresh needed.
+// We skip the echo of our own writes (suppressNextEcho) so a device doesn't
+// visibly "flicker" from its own save, and we skip re-writing inputs the
+// user is actively typing in so a remote update can't yank the cursor.
 function attachRealtimeListener(){
   if(!firestoreOK || !firestoreDocRef || !window.firebaseDB.onSnapshot) return;
   window.firebaseDB.onSnapshot(firestoreDocRef, (snap)=>{
     if(!snap.exists()) return;
-    if(snap.metadata.hasPendingWrites) return;
+    if(snap.metadata.hasPendingWrites) return; // this is our own write being echoed back locally
     if(suppressNextEcho){ suppressNextEcho = false; return; }
 
     Object.assign(store, snap.data());
@@ -1208,6 +1136,9 @@ function attachRealtimeListener(){
   });
 }
 
+// Pushes the current in-memory `store` onto every visible control. Called
+// once on first load, and again every time a remote device pushes a change
+// (via the realtime listener) so this device's screen stays live-updated.
 function applyStoreToUI(){
   const active = document.activeElement;
 
@@ -1298,6 +1229,9 @@ function calcTargets(){
   return {bmr:Math.round(bmr), tdee:Math.round(tdee), kcalTarget, proteinG, fatG, carbG, weeklyLossKg, bmi};
 }
 
+/* Smoothly counts a number element up/down to a new value instead of
+   snapping — skipped entirely for prefers-reduced-motion or when the
+   value hasn't actually changed. */
 const _countState = new WeakMap();
 function animateCount(el, newVal, suffix=''){
   newVal = Math.round(newVal);
@@ -1410,9 +1344,11 @@ document.querySelectorAll('.chips[data-group]').forEach(group=>{
     chip.addEventListener('click', ()=>{
       const isNone = chip.dataset.none === 'true';
       if(isSingle || isNone){
+        // single-select groups, and the "بدون" chip in any group, are exclusive
         group.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected'));
         chip.classList.add('selected');
       } else {
+        // multi-select group: toggle this chip, and drop "بدون" if it was active
         const noneChip = group.querySelector('.chip[data-none="true"]');
         if(noneChip) noneChip.classList.remove('selected');
         chip.classList.toggle('selected');
@@ -1440,7 +1376,12 @@ document.querySelectorAll('.chip[data-toggle="true"]').forEach((chip, idx)=>{
   });
 });
 
-/* ======================= PORTION CONTROL ======================= */
+/* ======================= PORTION CONTROL (كمية الصنف) =======================
+   بيدّي كل صنف رئيسي (بروتين/كارب/سناك) قدرة تحديد الكمية اللي فعلاً اتاكلت
+   (¼ / ½ / ¾ / كامل / زيادة) بدل ما يكون خيار واحد ثابت بس. الكمية الأساسية
+   (base) بتتحفظ في data-base-* أول مرة، والقيمة الفعلية المستخدمة في الحساب
+   (data-k/p/f/c) بتتحسب منها × النسبة، فباقي الكود (readSelectedChips،
+   المطابقة وقت الاسترجاع، الحساب الكلي) يفضل شغال زي ما هو من غير أي تغيير. */
 const PORTION_OPTIONS = [
   {v:0.25, label:'¼ كمية'}, {v:0.5, label:'½ كمية'}, {v:0.75, label:'¾ كمية'},
   {v:1,    label:'الكمية كاملة'}, {v:1.25, label:'1¼ كمية'}, {v:1.5, label:'1½ كمية'}, {v:2, label:'ضعف الكمية'}
@@ -1475,7 +1416,7 @@ function injectPortionSelects(){
     group.querySelectorAll('.chip').forEach((chip, idx)=>{
       chip.dataset.idx = idx;
       const isZeroChip = (+chip.dataset.k||0)===0 && (+chip.dataset.p||0)===0 && (+chip.dataset.f||0)===0 && (+chip.dataset.c||0)===0;
-      if(chip.dataset.none === 'true' || isZeroChip) return;
+      if(chip.dataset.none === 'true' || isZeroChip) return; // "بدون"/صفر سعرات مالهاش كمية
       chip.dataset.baseK = chip.dataset.k;
       chip.dataset.baseP = chip.dataset.p;
       chip.dataset.baseF = chip.dataset.f;
@@ -1488,6 +1429,7 @@ function injectPortionSelects(){
         if(o.v === 1) opt.selected = true;
         sel.appendChild(opt);
       });
+      // منع الكليك على الـ select من إنه يضرب handler اختيار/إلغاء الـ chip نفسه
       ['click','mousedown','touchstart'].forEach(evt=> sel.addEventListener(evt, e=>e.stopPropagation()));
       sel.addEventListener('change', ()=>{
         setChipPortionUI(chip, +sel.value);
@@ -1510,6 +1452,8 @@ injectPortionSelects();
 function restoreMealSelections(){
   document.querySelectorAll('.chips[data-group]').forEach(group=>{
     const name = group.dataset.group;
+    // الأول رجّع الكمية (النسبة) المحفوظة لكل صنف، عشان data-k/p/f/c تبقى
+    // مظبوطة قبل ما نيجي نطابق الاختيارات المحفوظة عليها
     if(isPortionableGroup(name)){
       const savedPortions = (store.portions && store.portions[name]) || {};
       group.querySelectorAll('.chip').forEach(chip=>{
@@ -1523,6 +1467,7 @@ function restoreMealSelections(){
     const savedArr = Array.isArray(saved) ? saved : (saved ? [saved] : []);
     const chips = [...group.querySelectorAll('.chip')];
     chips.forEach(c=>c.classList.remove('selected'));
+    // no default/forced selection anymore — a meal with nothing chosen stays uncounted
     savedArr.forEach(sv=>{
       const match = chips.find(c => +c.dataset.k===sv.k && +c.dataset.p===sv.p && +c.dataset.f===sv.f && +c.dataset.c===sv.c);
       if(match) match.classList.add('selected');
@@ -1536,7 +1481,10 @@ function restoreMealSelections(){
   renderCustomItems();
 }
 
-/* ======================= CUSTOM (MANUAL-CALORIE) MEAL ITEMS ======================= */
+/* ======================= CUSTOM (MANUAL-CALORIE) MEAL ITEMS =======================
+   لأي أكلة مش موجودة في اللستة: بتكتب اسمها (اختياري) وسعراتها (والماكروز لو
+   عايز) يدويًا، وبتتحسب زي أي اختيار تاني في الإجمالي. store.customItems =
+   { breakfast:[{id,label,k,p,f,c}], lunch:[...], dinner:[...] } */
 function customItemsSum(){
   let sum = {k:0,p:0,f:0,c:0};
   Object.values(store.customItems || {}).forEach(arr=>{
@@ -1574,7 +1522,7 @@ document.querySelectorAll('.custom-save-btn').forEach(btn=>{
     const meal = btn.dataset.meal;
     const form = document.querySelector('[data-custom-form="'+meal+'"]');
     const k = Math.round(+form.querySelector('.custom-k').value || 0);
-    if(k <= 0){ form.querySelector('.custom-k').focus(); return; }
+    if(k <= 0){ form.querySelector('.custom-k').focus(); return; } // السعرات لازم تتكتب
     const item = {
       id: 'c'+Date.now()+Math.floor(Math.random()*1000),
       label: form.querySelector('.custom-name').value.trim(),
@@ -1607,6 +1555,10 @@ document.querySelectorAll('.custom-chips').forEach(list=>{
 });
 
 /* ======================= RESET DAY (بدون) ======================= */
+// زرار "بدون" فوق الفطار: بيمسح كل اختيارات الوجبات (بروتين/كارب/سناك/
+// مشروبات)، الإضافات الحرة (زيت/سلطة/صودا)، والأصناف اليدوية المضافة —
+// وبيرجّع إجمالي السعرات النهاردة صفر. مالوش أي علاقة بالسلسلة أو الجيم
+// أو العادات التانية، دول بيفضلوا زي ما هم.
 function resetAllMealsToday(){
   document.querySelectorAll('.chips[data-group] .chip').forEach(c=>c.classList.remove('selected'));
   document.querySelectorAll('.chip[data-toggle="true"]').forEach(c=>c.classList.remove('selected'));
@@ -1621,17 +1573,26 @@ function resetAllMealsToday(){
 document.getElementById('reset-day-btn').addEventListener('click', resetAllMealsToday);
 
 /* ======================= HABITS / STREAK / CALENDAR ======================= */
+// ملحوظة مهمة على الفلسفة الجديدة هنا: يوم من غير أي تسجيل خالص لازم
+// يفضل "من غير تسجيل" فعلاً — مش يتحول تلقائي لـ false بمجرد ما تفتح
+// التطبيق. عشان كده todayLog() بقت من غير قيم افتراضية لـ dnr، وحذفنا
+// "training" خالص (بقت بتتحسب من gym.dailyLog بدل ما تتسجل هنا).
 function todayLog(){
   const k = todayKey();
   if(!store.habitLog[k]) store.habitLog[k] = {water:false, cardio:false};
   return store.habitLog[k];
 }
 
+// dnr بقت 3 حالات مش Boolean: 'done' / 'skipped' / undefined (يعني معملتش
+// حاجة). بندعم برضو القيمة القديمة (true) وبنحوّلها لـ'done' تلقائي —
+// أي بيانات قديمة اتسجلت false هتتحسب "معملتش حاجة" دلوقتي (مش قادرين
+// نعرف كانت "قلت لأ" ولا "مفتحتش التطبيق" أصلاً، فده أنسب تفسير).
 function normalizeDnrStatus(v){
   if(v === true || v === 'done') return 'done';
   if(v === 'skipped') return 'skipped';
   return null;
 }
+// كل ضغطة على كارت DNR بتلف: معملتش حاجة → عملتها → مش هعملها → ترجع تاني.
 function cycleDnr(){
   const l = todayLog();
   const cur = normalizeDnrStatus(l.dnr);
@@ -1643,6 +1604,8 @@ function cycleDnr(){
   renderStreak();
 }
 
+// null = showing today (live, editable). A 'YYYY-MM-DD' string = showing a
+// past day picked from the calendar (read-only snapshot of that day's log).
 let viewedDayKey = null;
 
 function renderHabits(t){
@@ -1739,10 +1702,12 @@ function renderHabits(t){
     }
     grid.appendChild(el);
   });
-
-  if(isToday && window.LolaAvatar && typeof reflectAvatarState === 'function') reflectAvatarState();
 }
 
+// دلوقتي "اليوم مكتمل" بيتطلب gym.dailyLog يكون 'done' أو 'rest' (بدل
+// rec.training القديمة اللي بقت مش موجودة أصلاً). لاحظ إن isDayComplete/
+// isDayPartial بقوا محتاجين dateKey صريح عشان يقدروا يقرأوا سجل الجيم
+// بتاريخه الصح (كانوا قبل كده بس بيقروا من الـ rec نفسه).
 function isDayComplete(rec, dateKey){
   if(!rec || !dateKey) return false;
   const gymOk = gymStatusOn(dateKey) === 'done' || gymStatusOn(dateKey) === 'rest';
@@ -1755,7 +1720,7 @@ function isDayPartial(rec, dateKey){
   return !!(rec.calories || gymLogged || rec.water || rec.cardio || dnrLogged) && !isDayComplete(rec, dateKey);
 }
 
-let selectedCalDay = null;
+let selectedCalDay = null; // key of the day currently shown in the "عادات اليوم" card below
 
 function updateHabitsTitle(dayLabel){
   document.getElementById('habits-title').textContent = dayLabel ? ('عادات يوم ' + dayLabel) : 'عادات اليوم';
@@ -1768,7 +1733,7 @@ function renderCalendar(){
   const bar = document.getElementById('calendar-bar');
   bar.innerHTML = '';
   const now = new Date();
-  const weekday = now.getDay();
+  const weekday = now.getDay(); // 0=Sun
   const sunday = new Date(now); sunday.setDate(now.getDate()-weekday);
   for(let i=0;i<7;i++){
     const d = new Date(sunday); d.setDate(sunday.getDate()+i);
@@ -1792,6 +1757,7 @@ function renderCalendar(){
 function renderStreak(){
   let streak = 0;
   let d = new Date();
+  // if today isn't complete yet, start counting from yesterday so an in-progress day doesn't break the streak display
   if(!isDayComplete(store.habitLog[todayKey(d)], todayKey(d))){
     d.setDate(d.getDate()-1);
   }
@@ -1816,13 +1782,21 @@ function renderStreak(){
     : msgs[0];
 }
 
-/* ======================= HABIT HISTORY & ANALYTICS ======================= */
+/* ======================= HABIT HISTORY & ANALYTICS (تمرين الجيم / DNR) =======================
+   صفحة تفصيلية بتفتح من زرار 📊 على كارت الجيم أو DNR. بتجاوب على 3
+   أسئلة إنت طلبتها بالظبط: "امتى سجلت / امتى ماسجلتش"، "إيه معدلي؟"،
+   و"هل بعمل تقدم؟" — من غير ما تخلط "معملتش حاجة" بـ"قلت لأ صراحةً".
+
+   المعادلة المستخدمة لمعدل الالتزام:
+     معدل % = عملت ÷ (عملت + قلت-لأ-صراحةً + معملتش-حاجة)
+   يوم "راحة" (للجيم بس) بيتشال من المعادلة تمامًا — مش يوم المفروض تتمرن
+   فيه أصلاً، فمش عادل يتحسب معاك ولا عليك. */
 const HABIT_HISTORY_CONFIG = {
   gym: {
     title: 'تمرين الجيم — السجل والتحليل',
     getStatus: gymStatusOn,
-    goodStates: ['done','rest'],
-    excludeFromDenom: ['rest'],
+    goodStates: ['done','rest'],      // بتحافظ على الستريك
+    excludeFromDenom: ['rest'],       // متتحسبش في معادلة المعدل
     labels: {done:'لعبت', skipped:'مش لعبت', rest:'راحة', unlogged:'معملتش حاجة'}
   },
   dnr: {
@@ -1838,7 +1812,7 @@ function lastNDateKeys(n, endDate){
   const arr = [];
   const d = endDate ? new Date(endDate) : new Date();
   for(let i=0;i<n;i++){ arr.push(todayKey(d)); d.setDate(d.getDate()-1); }
-  return arr;
+  return arr; // newest -> oldest، الترتيب مش مهم للحساب
 }
 
 function habitAdherence(cfg, dateKeys){
@@ -1857,7 +1831,7 @@ function habitAdherence(cfg, dateKeys){
 function habitStreakInfo(cfg){
   const good = cfg.goodStates;
   let d = new Date();
-  if(!good.includes(cfg.getStatus(todayKey(d)))) d.setDate(d.getDate()-1);
+  if(!good.includes(cfg.getStatus(todayKey(d)))) d.setDate(d.getDate()-1); // زي renderStreak بالظبط
   let current = 0;
   let cur = new Date(d);
   while(good.includes(cfg.getStatus(todayKey(cur)))){
@@ -1866,7 +1840,7 @@ function habitStreakInfo(cfg){
   }
   let best=0, run=0;
   const scan = new Date();
-  scan.setDate(scan.getDate()-120);
+  scan.setDate(scan.getDate()-120); // بنمسح آخر 120 يوم عشان نلاقي أفضل ستريك
   for(let i=0;i<=120;i++){
     if(good.includes(cfg.getStatus(todayKey(scan)))){ run++; best=Math.max(best,run); }
     else run=0;
@@ -1915,6 +1889,8 @@ function renderHabitHistory(habitId){
     <div class="hm-badge ${trendCls}"><div class="v mono">${trendTxt}</div><div class="l">آخر أسبوع مقابل اللي فات</div></div>
   `;
 
+  // heatmap: أسبوعين كاملين (14 يوم)، محاذيين على بداية الأسبوع بالأحد
+  // زي تقويم التتبع بالظبط — أقدم أسبوع فوق، النهاردة في آخر خانة تحت.
   const now = new Date();
   const thisSunday = new Date(now); thisSunday.setDate(now.getDate()-now.getDay());
   const gridStart = new Date(thisSunday); gridStart.setDate(thisSunday.getDate()-7);
@@ -1938,6 +1914,8 @@ function renderHabitHistory(habitId){
     stateOrder.map(s=>`<span><i style="background:var(${colorVar(s)})"></i>${cfg.labels[s]}</span>`).join('')
     + `<span><i style="background:transparent;border:1.5px dashed var(--line);"></i>${cfg.labels.unlogged}</span>`;
 
+  // المعدل حسب يوم الأسبوع (آخر ~10 أسابيع) — بيوريك مثلاً إنك دايمًا
+  // بتسيب الجيم يوم الخميس، حاجة صعب تلاحظها من غير الرسم ده.
   const weekdayStats = [0,1,2,3,4,5,6].map(wd=>{
     const dks = [];
     let d = new Date();
@@ -2009,11 +1987,11 @@ function populateExchRef(){
 
 function renderExchange(){
   const list = exchTab === 'protein' ? proteinFoods : carbFoods;
-  const key = exchTab === 'protein' ? 'p' : 'c';
+  const key = exchTab === 'protein' ? 'p' : 'c'; // the macro this whole calculator matches on
   const refIdx = +document.getElementById('exch-ref').value || 0;
   const refGrams = +document.getElementById('exch-grams').value || 100;
   const ref = list[refIdx];
-  const refValueTotal = ref[key] * refGrams / 100;
+  const refValueTotal = ref[key] * refGrams / 100; // this is the fixed target — every row is scaled to hit this same amount
 
   document.getElementById('exch-primary-th').textContent = exchTab === 'protein' ? 'بروتين (جم)' : 'كارب (جم)';
 
@@ -2031,6 +2009,9 @@ function renderExchange(){
       grams = Math.round(refValueTotal / f[key] * 100);
       kcal = Math.round(f.k * grams / 100);
     }
+    // The macro grams actually delivered at this serving size — should land
+    // on (or extremely close to, due to gram rounding) refValueTotal for
+    // EVERY row, since that's the whole point: same protein/carb, different food.
     const macroVal = f[key] * grams / 100;
     const macroTxt = macroVal >= 10 ? Math.round(macroVal) : macroVal.toFixed(1);
     tr.innerHTML = '<td>' + f.name + '</td><td class="num">' + grams + ' جم</td><td class="num exch-highlight-col">' + macroTxt + ' جم</td><td class="num">' + kcal + '</td>';
@@ -2039,6 +2020,9 @@ function renderExchange(){
 }
 
 /* ======================= GYM WORKOUTS ======================= */
+// دورة 7 محطات: 5 أيام تمرين + يومين راحة. مفيش ربط بيوم الأسبوع — كل
+// محطة بتتقدم للي بعدها لما تدوس "خلصت التمرين"، وتفضل واقفة في مكانها
+// لو دوست "مش هلعب النهاردة" (يعني نفس التمرين هيستناك المرة الجاية).
 const GYM_DAY_ORDER = ['push','pull','legs','rest1','upper','lower','rest2'];
 const MUSCLE_ICONS = {
   'صدر':'🎯', 'تراي':'🔻', 'باي':'🔺', 'ضهر':'🦾', 'كتف':'⛰️', 'رجلين':'🦵', 'كور':'🌀'
@@ -2096,6 +2080,10 @@ function ensureGymStore(){
   store.gym.dailyLog = store.gym.dailyLog || {};
 }
 
+/* ======================= GYM ATTENDANCE LOG (بتاريخ حقيقي) =======================
+   منفصل تمامًا عن "gym.day" (مؤشر دورة الـ7 محطات). بيجاوب على سؤال واحد
+   بس: "يوم X (بتاريخه) كان إيه؟" — 'done' / 'skipped' / 'rest' / مش موجودة
+   خالص (يعني معملتش حاجة). بيتغذى من نفس زراير تاب الجيم الموجودة أصلاً. */
 function gymStatusOn(dateKey){
   return (store.gym && store.gym.dailyLog && store.gym.dailyLog[dateKey]) || null;
 }
@@ -2173,8 +2161,10 @@ function updateGymCardSummary(card,day,name){
   const nowComplete = sum.total>0 && pct===100;
   card.classList.toggle('ex-complete', nowComplete);
   if(nowComplete && !wasComplete){
+    // Retrigger the glow/pulse animation even if the class was already
+    // toggled off-and-on in the same tick (e.g. unchecking then rechecking).
     card.classList.remove('ex-complete-pulse');
-    void card.offsetWidth;
+    void card.offsetWidth; // force reflow so the animation restarts
     card.classList.add('ex-complete-pulse');
   }
 }
@@ -2185,6 +2175,11 @@ function setGymDay(day){
   renderGymDay();
 }
 
+// بتنقل المؤشر للمحطة الجاية في الدورة (Push→Pull→Legs→Rest→Upper→Lower→Rest)
+// وترجع تاني للأول بعد ما تخلص. بتتصل من زرار "خلصت التمرين".
+// دلوقتي بتسجّل برضو في gym.dailyLog بتاريخ النهاردة: 'rest' لو المحطة
+// اللي كنت واقف عندها كانت يوم راحة، أو 'done' لو كانت تمرين فعلي —
+// ده اللي بيغذي عادة "تمرين الجيم" وصفحة التحليل.
 function advanceGymDay(){
   const wasRest = !!GYM_DAYS[store.gym.day].isRest;
   setGymStatusToday(wasRest ? 'rest' : 'done');
@@ -2198,6 +2193,10 @@ function advanceGymDay(){
   renderStreak();
 }
 
+// "مش هلعب النهاردة" — المحطة الحالية متتحركش خالص، تفضل مستنياك المرة
+// الجاية. بنسجل النهاردة كـ'skipped' في gym.dailyLog — ده أهم فرق عن قبل:
+// كان بيتسجل بس lastSkippedAt للعرض، دلوقتي بقى جزء رسمي من سجل الحضور
+// وبيدخل في حساب معدل الالتزام بدل ما يضيع.
 function skipGymDay(){
   store.gym.lastSkippedAt = new Date().toISOString();
   setGymStatusToday('skipped');
@@ -2241,6 +2240,9 @@ function renderGymDay(){
       </div>`;
     }).join('');
   }
+  // Staggered entrance so cards feel like they're arriving one after another
+  // instead of all popping in at once — small touch, but it's what separates
+  // a "generated list" feel from a considered one.
   list.querySelectorAll('.ex-card').forEach((card,i)=>{
     card.style.animationDelay = (i*55) + 'ms';
   });
@@ -2259,6 +2261,9 @@ function renderGymDay(){
   }
 }
 
+// Event delegation on the exercise list — handles typing in set inputs,
+// checking a set as done, adding a new set, and deleting a set — without
+// rebuilding the whole list on every keystroke (keeps focus/cursor intact).
 document.getElementById('gym-exercise-list').addEventListener('input', e=>{
   if(!e.target.classList.contains('set-input')) return;
   const card = e.target.closest('.ex-card');
@@ -2319,6 +2324,8 @@ document.getElementById('gym-stretch-list').addEventListener('change', e=>{
 });
 
 /* ======================= SHOPPING LIST ======================= */
+// Wiring (event listeners) can happen immediately; the checked state itself
+// is set inside initApp() below, once store data has actually loaded.
 document.querySelectorAll('#shop-grid input[type=checkbox]').forEach(cb=>{
   const id = cb.dataset.id;
   cb.addEventListener('change', ()=>{
@@ -2328,9 +2335,13 @@ document.querySelectorAll('#shop-grid input[type=checkbox]').forEach(cb=>{
 });
 
 /* ======================= DAILY MEAL RESET ======================= */
+// مع أول فتح للتطبيق في يوم جديد (حسب تاريخ جهازك المحلي)، بيصفّي كل
+// اختيارات الوجبات (بروتين/كارب/سناك/مشروبات) والإضافات الحرة (زيت
+// زيتون، سلطة...) — بس ملوش أي علاقة بالسلسلة (streak) ولا سجل تمارين
+// الجيم ولا العادات اليومية، دول بيفضلوا زي ما هم.
 function maybeResetDailyMeals(){
   const today = todayKey();
-  if(store.mealsLastResetDate === today) return;
+  if(store.mealsLastResetDate === today) return; // اتصفّت قبل كده النهاردة
   store.selections = {};
   store.toggles = {};
   store.customItems = {};
@@ -2338,245 +2349,9 @@ function maybeResetDailyMeals(){
   saveStore();
 }
 
-/* ======================= LOLA — 3D AVATAR + CHAT (Gemini Function Calling) =======================
-   الفقاعة العائمة بتفتح شيت فيه الأفاتار (بيتحمل lazy أول فتحة بس) + شات
-   بيقدر فعليًا يسجّل بيانات في نفس الـ store (مش بس يرد كلام) — عن طريق
-   Gemini Function Calling بيربط على todayLog/advanceGymDay/skipGymDay/
-   setDnrStatus الموجودين فوق بالفعل. */
-
-function setDnrStatus(status){
-  const l = todayLog();
-  if(status === 'done' || status === 'skipped') l.dnr = status; else delete l.dnr;
-  saveStore();
-  renderHabits(calcTargets());
-  renderCalendar();
-  renderStreak();
-}
-
-function sumTodayCalories(){
-  let k = 0;
-  Object.values(store.selections).forEach(arr=>(Array.isArray(arr)?arr:[arr]).forEach(v=>k+=v.k));
-  Object.values(store.toggles).forEach(v=>k+=v.k);
-  k += customItemsSum().k;
-  return k;
-}
-
-function getTodayStatusSnapshot(){
-  const t = calcTargets();
-  const l = todayLog();
-  return {
-    calories_eaten: sumTodayCalories(),
-    calories_target: t.kcalTarget,
-    calories_marked_within_target: !!l.calories,
-    water_done: !!l.water,
-    cardio_done: !!l.cardio,
-    gym_status: gymStatusOn(todayKey()) || 'unlogged',
-    dnr_status: normalizeDnrStatus(l.dnr) || 'unlogged'
-  };
-}
-
-const LOLA_FUNCTIONS = {
-  log_water: ({done}) => { todayLog().water = !!done; saveStore(); renderHabits(calcTargets()); renderCalendar(); renderStreak(); return {ok:true}; },
-  log_cardio: ({done}) => { todayLog().cardio = !!done; saveStore(); renderHabits(calcTargets()); renderCalendar(); renderStreak(); return {ok:true}; },
-  log_calories: ({done}) => { todayLog().calories = !!done; saveStore(); renderHabits(calcTargets()); renderCalendar(); renderStreak(); return {ok:true}; },
-  log_gym: ({status}) => { if(status==='done') advanceGymDay(); else if(status==='skipped') skipGymDay(); return {ok:true}; },
-  log_dnr: ({status}) => { setDnrStatus(status); return {ok:true}; },
-  get_today_status: () => getTodayStatusSnapshot()
-};
-
-const LOLA_TOOLS = [{
-  functionDeclarations: [
-    { name:'log_water', description:'يسجل إن اليوزر شرب كمية المياه المستهدفة النهاردة أو لأ', parameters:{type:'object', properties:{done:{type:'boolean'}}, required:['done']} },
-    { name:'log_cardio', description:'يسجل إن اليوزر عمل الكارديو النهاردة أو لأ', parameters:{type:'object', properties:{done:{type:'boolean'}}, required:['done']} },
-    { name:'log_calories', description:'يسجل إن اليوزر التزم بهدف السعرات النهاردة أو لأ — استخدمها بس لو قال صراحة إنه التزم أو خرج عن الهدف', parameters:{type:'object', properties:{done:{type:'boolean'}}, required:['done']} },
-    { name:'log_gym', description:'يسجل حالة تمرين الجيم النهاردة', parameters:{type:'object', properties:{status:{type:'string', enum:['done','skipped']}}, required:['status']} },
-    { name:'log_dnr', description:'يسجل حالة عادة DNR النهاردة', parameters:{type:'object', properties:{status:{type:'string', enum:['done','skipped']}}, required:['status']} },
-    { name:'get_today_status', description:'يرجع ملخص حقيقي لحالة اليوزر النهاردة — استخدمها قبل أي رد عن التقدم بدل ما تخمّني', parameters:{type:'object', properties:{}} }
-  ]
-}];
-
-// ⚠️ المفتاح ده هيبقى ظاهر لأي حد يفتح View Source. مقبول لمشروع شخصي
-// مش هيتنشر — لو الريبو بقى عام يوم ما، ده أول حاجة تتنقل لسيرفر
-// (GitHub Action زي send-notifications.js بالظبط).
-const GEMINI_API_KEY = 'AQ.Ab8RN6Ivqdfg0GpCz22YB4EUcrFmzf7TKt1IgN_t7ikdYIzOvA';
-const GEMINI_MODEL = 'gemini-2.0-flash';
-const GEMINI_CHAT_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
-
-const LOLA_SYSTEM_PROMPT = `انتِ لولا، مساعدة تتبع لياقة وتغذية شخصية لزياد. ردودك بالعامية المصرية، قصيرة (سطر أو اتنين)، دافية بس من غير مبالغة.
-عندك أدوات فعلية تقدري تسجّلي بيها حاجات في التطبيق (مياه/كارديو/سعرات/جيم/DNR) — لو قال إنه عمل حاجة، استخدمي الأداة المناسبة على طول بدل ما تردي بكلام بس.
-لو مش متأكدة من حالة اليوم، نادي get_today_status الأول قبل ما تردي.`;
-
-let lolaHistory = [];
-let lolaGreeted = false;
-let lolaAvatarLoaded = false;
-
-async function callLolaFunction(name, args){
-  const fn = LOLA_FUNCTIONS[name];
-  if(!fn) return {error:'unknown function'};
-  try{ return fn(args || {}); }catch(e){ return {error:String(e)}; }
-}
-
-async function askLola(userText){
-  lolaHistory.push({role:'user', parts:[{text:userText}]});
-  for(let round=0; round<4; round++){
-    const res = await fetch(GEMINI_CHAT_URL, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        contents: lolaHistory,
-        systemInstruction: {parts:[{text: LOLA_SYSTEM_PROMPT}]},
-        tools: LOLA_TOOLS,
-        generationConfig: {maxOutputTokens:220, temperature:0.7}
-      })
-    });
-    if(!res.ok) throw new Error('Gemini API error ' + res.status + ': ' + await res.text().catch(()=>''));
-    const data = await res.json();
-    const parts = data?.candidates?.[0]?.content?.parts || [];
-    const functionCalls = parts.filter(p=>p.functionCall);
-    if(functionCalls.length){
-      lolaHistory.push({role:'model', parts});
-      const responseParts = [];
-      for(const p of functionCalls){
-        const result = await callLolaFunction(p.functionCall.name, p.functionCall.args);
-        responseParts.push({functionResponse:{name:p.functionCall.name, response:result}});
-      }
-      lolaHistory.push({role:'function', parts:responseParts});
-      continue;
-    }
-    const textPart = parts.find(p=>p.text);
-    const fullText = textPart ? textPart.text : 'تمام 👍';
-    lolaHistory.push({role:'model', parts:[{text:fullText}]});
-    return fullText;
-  }
-  return 'حصل تكرار غريب في تنفيذ الأوامر — جرب تاني.';
-}
-
-// ---- ربط حالة تعبير الأفاتار بالبيانات الحقيقية ----
-function reflectAvatarState(){
-  if(!window.LolaAvatar) return;
-  const dk = todayKey();
-  const gymToday = gymStatusOn(dk);
-  let blankDays = 0;
-  let d = new Date();
-  for(let i=0;i<3;i++){
-    const k = todayKey(d);
-    const rec = store.habitLog[k];
-    const hadAnyLog = !!(rec && (rec.calories || rec.water || rec.cardio || normalizeDnrStatus(rec.dnr)!=null)) || gymStatusOn(k)!=null;
-    if(!hadAnyLog) blankDays++;
-    d.setDate(d.getDate()-1);
-  }
-  const state = blankDays >= 3 ? 'support' : (gymToday === 'done' ? 'playful' : 'idle');
-  const panel = document.getElementById('lola-panel');
-  if(panel) panel.dataset.lolaState = state;
-  window.LolaAvatar.setAvatarState(state, document.getElementById('lola-fx-layer'));
-  const fab = document.getElementById('lola-fab');
-  if(fab) fab.classList.toggle('attention', blankDays >= 3);
-}
-
-function buildLolaGreeting(){
-  const gymToday = gymStatusOn(todayKey());
-  if(gymToday === 'done') return 'أهلاً! شفت إنك خلصت الجيم النهاردة 💪 عاش يا وحش، محتاج حاجة تانية؟';
-  if(gymToday === 'skipped') return 'أهلاً بيك. شايفة إنك مش هتلعب النهاردة — قولّي لو محتاج حاجة تانية.';
-  return 'أهلاً! أنا لولا. قولّي عملت إيه النهاردة وأنا أسجله لك.';
-}
-
-function addLolaMessage(text, who){
-  const log = document.getElementById('lola-chat-log');
-  const div = document.createElement('div');
-  div.className = 'lola-msg ' + who;
-  div.textContent = text;
-  log.appendChild(div);
-  log.scrollTop = log.scrollHeight;
-  return div;
-}
-function addLolaTyping(){
-  const log = document.getElementById('lola-chat-log');
-  const row = document.createElement('div');
-  row.className = 'lola-typing-row';
-  row.innerHTML = '<span></span><span></span><span></span>';
-  log.appendChild(row);
-  log.scrollTop = log.scrollHeight;
-  return row;
-}
-function typeIntoLola(el, text){
-  const panel = document.getElementById('lola-panel');
-  if(panel) panel.dataset.lolaTalking = 'true';
-  if(window.LolaAvatar) window.LolaAvatar.setTalking(true);
-  return new Promise(resolve=>{
-    let i = 0;
-    const log = document.getElementById('lola-chat-log');
-    const t = setInterval(()=>{
-      el.textContent = text.slice(0,i);
-      i++;
-      log.scrollTop = log.scrollHeight;
-      if(i > text.length){
-        clearInterval(t);
-        if(panel) panel.dataset.lolaTalking = 'false';
-        if(window.LolaAvatar) window.LolaAvatar.setTalking(false);
-        resolve();
-      }
-    }, 22);
-  });
-}
-
-async function handleLolaSend(){
-  const input = document.getElementById('lola-msg-input');
-  const sendBtn = document.getElementById('lola-send-btn');
-  const text = input.value.trim();
-  if(!text) return;
-  addLolaMessage(text, 'user');
-  input.value = '';
-  sendBtn.disabled = true;
-  const typingRow = addLolaTyping();
-  try{
-    const reply = await askLola(text);
-    typingRow.remove();
-    const el = addLolaMessage('', 'bot');
-    await typeIntoLola(el, reply);
-    reflectAvatarState();
-  }catch(err){
-    typingRow.remove();
-    console.error(err);
-    addLolaMessage('في مشكلة في الاتصال بلولا — تأكد من الـ API key بتاعك. (تفاصيل في console)', 'bot');
-  }finally{
-    sendBtn.disabled = false;
-  }
-}
-
-document.getElementById('lola-send-btn').addEventListener('click', handleLolaSend);
-document.getElementById('lola-msg-input').addEventListener('keydown', e=>{ if(e.key === 'Enter') handleLolaSend(); });
-
-document.getElementById('lola-fab').addEventListener('click', ()=>{
-  document.getElementById('lola-overlay').classList.add('show');
-  if(!lolaAvatarLoaded){
-    lolaAvatarLoaded = true;
-    window.LolaAvatar.initAvatar(document.getElementById('lola-canvas-mount'), './lola.vrm', (err)=>{
-      const loadingEl = document.getElementById('lola-loading');
-      if(loadingEl) loadingEl.style.display = 'none';
-      if(err){ console.error('فشل تحميل الأفاتار:', err); return; }
-      reflectAvatarState();
-      if(!lolaGreeted){
-        lolaGreeted = true;
-        const greet = buildLolaGreeting();
-        const el = addLolaMessage('', 'bot');
-        typeIntoLola(el, greet);
-        lolaHistory.push({role:'model', parts:[{text:greet}]});
-      }
-    });
-  } else {
-    reflectAvatarState();
-  }
-});
-document.getElementById('lola-close').addEventListener('click', ()=>{
-  document.getElementById('lola-overlay').classList.remove('show');
-});
-document.getElementById('lola-overlay').addEventListener('click', e=>{
-  if(e.target.id === 'lola-overlay') document.getElementById('lola-overlay').classList.remove('show');
-});
-
 /* ======================= INIT ======================= */
 async function initApp(){
-  await initStore();
+  await initStore(); // waits for local cache + Firestore reconciliation (and starts the realtime listener)
 
   maybeResetDailyMeals();
 
@@ -2593,11 +2368,17 @@ async function initApp(){
 
   initScrollReveal();
 
+  // لو جاي من رابط إشعار فيه ?tab=gym (زي تذكير الجيم بتاع منتصف الليل)،
+  // افتح تاب الجيم على طول بدل ما يفضل واقف على أول تاب افتراضي.
   const urlTab = new URLSearchParams(location.search).get('tab');
   if(urlTab && document.getElementById('panel-' + urlTab)){
     setTab(urlTab);
   }
 }
+// Shows the macros (protein/carb/fat) for every meal-builder chip, right
+// under the calorie count — reads them straight from each chip's own
+// data-p/data-c/data-f attributes, so it always matches the real numbers
+// used in the calculation and there's nothing to keep in sync by hand.
 function annotateChipMacros(){
   document.querySelectorAll('.meal-block .chips .chip[data-k]').forEach(chip=>{
     const small = chip.querySelector('small');
@@ -2614,6 +2395,10 @@ function annotateChipMacros(){
 annotateChipMacros();
 
 // ======================= PUSH NOTIFICATIONS =======================
+// This is the ONLY secret-free piece: the public VAPID key. It's meant to
+// be public — it just tells the browser which server is allowed to push to
+// it. The matching PRIVATE key lives only in the GitHub Actions secret used
+// by the sending script, never in this file.
 const VAPID_PUBLIC_KEY = 'BOrOmmXsx2vqTZItAhjb9Y8pcGep2c0MmpBafGDE0zgdQx9Wm8N-6pKYhqZMjuBtK1wU_j-AifF8ENmlvyWNrkI';
 
 function urlBase64ToUint8Array(base64String){
@@ -2654,6 +2439,7 @@ async function subscribeToPush(){
     });
     const subJson = sub.toJSON();
     store.pushSubscriptions = store.pushSubscriptions || [];
+    // avoid saving the same device twice if they press the button again
     const exists = store.pushSubscriptions.some(s => s.endpoint === subJson.endpoint);
     if(!exists){
       store.pushSubscriptions.push(subJson);
@@ -2669,12 +2455,20 @@ async function subscribeToPush(){
 
 document.getElementById('push-btn').addEventListener('click', subscribeToPush);
 
+// On load, reflect whether this device is already subscribed (no need to
+// touch Firestore for this — the browser itself knows).
 if('serviceWorker' in navigator){
   navigator.serviceWorker.getRegistration('./sw.js').then(reg=>{
     if(reg) reg.pushManager.getSubscription().then(sub=>{ if(sub) setPushButtonState(true); });
   });
 }
 
+
+// initApp() must not run until Firebase's module script (window.firebaseReady)
+// has actually executed. Module scripts are deferred by the browser and run
+// right before 'DOMContentLoaded' — but THIS classic script runs immediately
+// as the parser reaches it, which is earlier. Waiting for DOMContentLoaded
+// guarantees the module script has already set up window.firebaseReady.
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initApp);
 } else {
