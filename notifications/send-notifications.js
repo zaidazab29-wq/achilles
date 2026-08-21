@@ -34,7 +34,7 @@ function buildGymReminders(store){
   if(isRest){
     // يوم راحة: تنبيه الـ12 بالليل بس (مفيش داعي نفكّره الساعة 6 بتمرين مش موجود).
     return [
-      { id:'gym_day', hour:0, minute:0, title:'Lola — يوم راحة 🌙', body:'النهاردة يوم راحة في جدولك — خد وقتك وارتاح كويس.' }
+      { id:'gym_day', hour:0, minute:0, title:'Lola — خد راحتك النهاردة 🌙', body:'النهاردة يوم راحة في جدولك، مفيش داعي تحمّل جسمك أكتر من طاقته. ارتاح وانت مرتاح البال.' }
     ];
   }
   const label = GYM_DAY_LABELS[day];
@@ -42,29 +42,29 @@ function buildGymReminders(store){
   return [
     {
       id:'gym_day', hour:0, minute:0,
-      title:'Lola — تمرين النهاردة 💪',
-      body: `متنساش ${bodyLabel} النهاردة.`,
+      title:'Lola — يلا بينا 💪',
+      body: `فاكرك جاهز لـ${bodyLabel} النهاردة — خد بالك من نفسك وانت بتلعب.`,
       url:'./?tab=gym'
     },
     {
       // نفس تمرين اليوم، تذكير تاني الساعة 6 مساءً قبل ما اليوم يخلص.
       id:'gym_evening', hour:18, minute:0,
-      title:'Lola — تمرين النهاردة 💪',
-      body: `متنساش ${bodyLabel} النهاردة.`,
+      title:'Lola — لسه فيه وقت 💪',
+      body: `لو لسه مسجّلتش ${bodyLabel}، اليوم لسه فيه وقت. وإن كنت خلصت بالفعل، عاش يا وحش 🙌`,
       url:'./?tab=gym'
     }
   ];
 }
 
 const REMINDERS = [
-  { id: 'breakfast',     hour: 15, minute: 0, title: 'Lola — الفطار 🍳',      body: 'سجّلت فطارك النهاردة؟ افتح Lola وحدّث بناء الوجبات.' },
-  { id: 'dinner_meds',   hour: 1,  minute: 0, title: 'Lola — العشا والدوا 💊',  body: 'قبل ما تنام: سجّلت العشا وأخدت الدوا؟' },
-  { id: 'teeth_morning', hour: 2,  minute: 30, title: 'Lola — صباح نظيف ✨',    body: 'فرشاة أسنان سريعة — ابتسامة بتشكرك الصبح كله!', url:'./?tab=track' },
-  { id: 'water_1',       hour: 10, minute: 0, title: 'Lola — ميه 💧',          body: 'وقت كوباية ميه — متنساش تشرب.' },
-  { id: 'water_2',       hour: 13, minute: 0, title: 'Lola — ميه 💧',          body: 'كوباية ميه دلوقتي كويسة.' },
-  { id: 'teeth_evening', hour: 14, minute: 30, title: 'Lola — نظافة وسعادة 🪥', body: 'وقت فرشاة الأسنان — أسنانك محتاجة الحب ده.', url:'./?tab=track' },
-  { id: 'water_3',       hour: 17, minute: 0, title: 'Lola — ميه 💧',          body: 'فاكر تشرب ميه؟ خد كوباية.' },
-  { id: 'water_4',       hour: 20, minute: 0, title: 'Lola — ميه 💧',          body: 'كوباية ميه قبل العشا.' }
+  { id: 'breakfast',     hour: 15, minute: 0,  title: 'Lola — فطارك جاهز؟ 🍳',    body: 'فطرت النهاردة ولا لسه؟ سجّله في بناء الوجبات عشان أقدر أطمّن عليك صح.' },
+  { id: 'dinner_meds',   hour: 1,  minute: 0,  title: 'Lola — قبل ما تنام 💊',     body: 'قبل ما تسيب نفسك تنام، خد بالك من العشا والدوا الأول — صحتك أهم حاجة عندي.' },
+  { id: 'teeth_wake',    hour: 14, minute: 30, title: 'Lola — صباح الخير عليك ☀️', body: 'أول ما تصحى، فرشاة أسنان سريعة وابدأ يومك بشوية نظافة وحنية لنفسك.', url:'./?tab=track' },
+  { id: 'water_1',       hour: 10, minute: 0,  title: 'Lola — كوباية ميه 💧',      body: 'متنساش تشرب ميه دلوقتي، جسمك محتاجها.' },
+  { id: 'water_2',       hour: 13, minute: 0,  title: 'Lola — ميه تاني 💧',        body: 'كوباية ميه دلوقتي هتفرق معاك، اشرب وانت مرتاح.' },
+  { id: 'teeth_sleep',   hour: 2,  minute: 30, title: 'Lola — قبل ما تنام 🪥',     body: 'اقفل يومك بفرشاة أسنان — دلّل نفسك شوية قبل النوم، أسنانك تستاهل الاهتمام ده.', url:'./?tab=track' },
+  { id: 'water_3',       hour: 17, minute: 0,  title: 'Lola — ميه 💧',            body: 'فاكر تشرب ميه؟ خد كوباية دلوقتي.' },
+  { id: 'water_4',       hour: 20, minute: 0,  title: 'Lola — آخر كوباية ميه 💧',  body: 'كوباية ميه قبل العشا هتساعدك، خدها بحبك.' }
 ];
 
 // كانت 20 دقيقة قبل كده. الـ cron الداخلي بتاع GitHub Actions مش مضمون
@@ -107,19 +107,8 @@ async function main(){
   // كامل (1440 دقيقة). الـ % 1440 هنا بيصلح المشكلة في كل الحالات.
   const cairoMinutesOfDay = ((+cairoParts.hour)*60 + (+cairoParts.minute)) % 1440;
 
-  // ملحوظة: مبنقراش pushLastSent هنا بشكل نهائي — كل تذكير بيقرا نسخته
-  // "الطازجة" بنفسه جوه الـ transaction تحت، عشان نضمن دقة القراءة وقت
-  // الحجز الفعلي مش وقت بداية الـ run.
-  // تذكيرات الجيم (12 بالليل + 6 مساءً) بتتبني هنا (مش جوه REMINDERS
-  // الثابتة) لأنها محتاجة تقرا store.gym.day الأول عشان تعرف تقول
-  // التمرين المناسب. لو يوم راحة، buildGymReminders بترجّع تذكير واحد
-  // بس (الـ12 بالليل).
   const allReminders = [...REMINDERS, ...buildGymReminders(store)];
 
-  // وضع الاختبار: لو حطيت id تذكير في input "test_reminder_id" وقت
-  // التشغيل اليدوي، بنبعته فورًا بغض النظر عن الوقت أو هل اتبعت قبل
-  // كده — ومهم: من غير ما نسجّل pushLastSent، عشان التجربة متمنعش
-  // الإرسال الحقيقي بعد كده في موعده الطبيعي.
   const testId = (process.env.TEST_REMINDER_ID || '').trim();
 
   for(const r of allReminders){
@@ -132,23 +121,13 @@ async function main(){
       if(!inWindow) continue;
     }
 
-    // "الحجز" ده لازم يحصل جوه transaction واحدة ذرية، مش قراءة وكتابة
-    // منفصلين. لو حصل إن الـ workflow اتشغّل مرتين قريبين من بعض جدًا
-    // (يدوي مرتين، أو تشغيل يدوي متزامن مع الـ cron العادي)، كان بيحصل
-    // إن الاتنين يقروا "لسه ما اتبعتش" قبل ما أي حد يكتب — فالاتنين
-    // يبعتوا (ده اللي حصل بالظبط وسبب تكرار الإشعار). الـ transaction
-    // بتضمن إن run واحد بس هو اللي يقدر "يحجز" حق الإرسال للتذكير ده
-    // النهاردة، والباقي هيتخطّوه تلقائيًا.
-    //
-    // في وضع الاختبار (isTest) مبنحجزش خالص — عشان التجربة ماتسجّلش
-    // "اتبعت النهاردة" وتمنع الإرسال الحقيقي بعدها بساعات في موعده.
     let claimed = true;
     if(!isTest){
       claimed = await db.runTransaction(async (tx)=>{
         const freshSnap = await tx.get(docRef);
         const freshData = freshSnap.data() || {};
         const freshLastSent = freshData.pushLastSent || {};
-        if(freshLastSent[r.id] === cairoDateStr) return false; // حد تاني حجزها/بعتها خلاص
+        if(freshLastSent[r.id] === cairoDateStr) return false;
         tx.update(docRef, { [`pushLastSent.${r.id}`]: cairoDateStr });
         return true;
       });
@@ -162,9 +141,6 @@ async function main(){
     console.log(`Sending "${r.id}" to ${subs.length} device(s)...`);
     const payload = JSON.stringify({
       title: r.title, body: r.body, tag: 'lola-'+r.id,
-      // مبنبعتش url إلا لو التذكير محدد واحد بنفسه (زي تذكير الجيم اللي
-      // بيودّي لتاب الجيم على طول). الباقي بيسيب sw.js يحدد الرابط
-      // الافتراضي بنفسه (self.registration.scope).
       ...(r.url ? { url: r.url } : {})
     });
 
@@ -176,16 +152,13 @@ async function main(){
       }catch(err){
         if(err.statusCode === 410 || err.statusCode === 404){
           console.log('Subscription expired, dropping it:', sub.endpoint);
-          // not pushed to stillValid → gets cleaned up below
         } else {
           console.error('Push failed for one device:', err.message);
-          stillValid.push(sub); // keep it, might be a transient error
+          stillValid.push(sub);
         }
       }
     }
 
-    // الحجز (dedupe flag) اتكتب خلاص جوه الـ transaction فوق. هنا بس
-    // بنحدّث قائمة الاشتراكات (نشيل اللي بايظة/منتهية).
     await docRef.update({ pushSubscriptions: stillValid });
 
     console.log(`Done: "${r.id}" sent.`);
