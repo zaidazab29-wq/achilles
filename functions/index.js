@@ -18,9 +18,7 @@ const cors = require('cors')({origin: true});
 
 // الـ API key بييجي من Firebase Secret Manager (شوف تعليمات الـ deploy في
 // DEPLOY.md) — مش مكتوب هنا كنص صريح عشان ميترفعش على GitHub بالغلط.
-const {defineSecret} = require('firebase-functions/params');
-const GEMINI_API_KEY = defineSecret('GEMINI_API_KEY');
-
+const GEMINI_API_KEY = "AQ.Ab8RN6JgzK31WoFVKDx7Ep9ORxApcb-0If2IMKoDhP6Ev9RjGQ";
 // كلمات ممنوعة من مخرجات النموذج — أي جملة فيها كلمة من دول بترفض ومنعرضهاش،
 // عشان نضمن إن الـ NLG تفضل "وصف نمط" مش "حكم/تشخيص/نصيحة طبية".
 const BANNED_WORDS = ['مرض', 'اضطراب', 'خطير', 'تشخيص', 'علاج طبي', 'إدمان مزمن', 'فاشل', 'ضعيف الإرادة'];
@@ -74,8 +72,7 @@ exports.generateDnrInsight = onRequest(
         return;
       }
 
-      try{
-        const genAI = new GoogleGenerativeAI(GEMINI_API_KEY.value());
+      try{const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
         const model = genAI.getGenerativeModel({model: 'gemini-2.0-flash'});
         const prompt = buildPrompt(stats);
         const result = await model.generateContent(prompt);
