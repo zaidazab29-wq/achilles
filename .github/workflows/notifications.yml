@@ -1,0 +1,64 @@
+name: Lola Daily Reminders
+
+on:
+  schedule:
+    # كل 15 دقيقة، على مدار اليوم كله. المواعيد الفعلية بتتحسب جوه السكريبت
+    # نفسه، مش هنا — عشان كده مش محتاجين نعدّل الملف ده لما توقيت مصر
+    # الصيفي/الشتوي يتغيّر.
+    #
+    # ملحوظة عن التوقيت: GitHub نفسها بتقول إن الجداول اللي بتشتغل بالظبط
+    # على بداية الساعة (زي :00) بتاخد تأخير أكتر من غيرها لازدحام السيرفرات
+    # في نفس اللحظة عند كل اليوزرز التانيين. الإزاحة لـ 7/22/37/52 بدل
+    # 0/15/30/45 بتجنّب اللحظة الأكتر ازدحامًا من غير ما تغيّر عدد مرات
+    # التشغيل ولا تحتاج أي حساب أو خدمة خارجية.
+    - cron: '7,22,37,52 * * * *'
+  workflow_dispatch: # بيدّيك زرار "Run workflow" يدوي من تاب Actions، للتجربة، وبرضو ده نفس الـ endpoint اللي cron-job.org بينده عليه (شوف الملحوظة تحت)
+    inputs:
+      test_reminder_id:
+        description: 'للاختبار بس: حط id تذكير (زي gym_day أو water_1) عشان يتبعت فورًا بغض النظر عن الوقت أو هل اتبعت قبل كده. سيبه فاضي للتشغيل العادي.'
+        required: false
+        default: ''
+      test_custom_reminder_id:
+        description: 'للاختبار بس: حط id تذكير مخصص (رقم الـ id اللي التطبيق ولّده) عشان يتبعت فورًا بغض النظر عن معاده أو هل اتبعت قبل كده. سيبه فاضي للتشغيل العادي.'
+        required: false
+        default: ''
+    # ملحوظة عن دقة التوقيت: GitHub's own `schedule:` trigger فوق مش مضمون
+    # يشتغل بالظبط كل 15 دقيقة — ممكن يتأخر لعدة دقايق وقت الزحمة، وده مقبول
+    # للتذكيرات اليومية الثابتة (WINDOW_MINUTES=45 دقيقة بيستوعب التأخير ده)،
+    # لكن مش دقيق كفاية لو عايز التذكيرات المخصصة (reminder modal) توصل قريب
+    # من معادها بالظبط. لو محتاج دقة أعلى (لحد دقيقة واحدة) من غير أي كارت
+    # ائتمان أو Cloud Functions:
+    # 1. اعمل حساب مجاني على cron-job.org.
+    # 2. من GitHub، اعمل fine-grained personal access token (Settings → Developer
+    #    settings → Fine-grained tokens) بصلاحية "Actions: Read and write" على
+    #    الـ repo ده بس.
+    # 3. في cron-job.org اعمل job جديد: POST على
+    #    https://api.github.com/repos/<owner>/<repo>/actions/workflows/notifications.yml/dispatches
+    #    بالـ headers: Authorization: Bearer <التوكن>, Accept: application/vnd.github+json
+    #    والـ body: {"ref":"main"}  (أو اسم الفرع اللي شغال عليه فعلاً)
+    #    وكرره كل دقيقة.
+    # ده بيخلي workflow_dispatch فوق يتنده كل دقيقة بدل ما يستنى جدول GitHub
+    # الأساسي — الـ `schedule:` فوق ينفع يفضل موجود كـ نسخة احتياطية.
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: notifications
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - run: npm install
+
+      - run: node send-notifications.js
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          TEST_REMINDER_ID: ${{ inputs.test_reminder_id }}
+          TEST_CUSTOM_REMINDER_ID: ${{ inputs.test_custom_reminder_id }}
