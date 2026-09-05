@@ -157,17 +157,17 @@ header.chart::before{content:"";position:absolute;inset:0;background-image:repea
 .chart-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;}
 .chart.lola-hero{position:relative;overflow:hidden;border-color:rgba(139,127,232,.3);background:linear-gradient(160deg, var(--violet-panel) 0%, var(--panel) 70%);}
 .chart.lola-hero::before{content:"";position:absolute;top:-140px;right:-100px;width:380px;height:380px;border-radius:50%;background:radial-gradient(circle, var(--violet) 0%, transparent 70%);opacity:.25;pointer-events:none;}
-.lola-hero-grid{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;}
-.lola-hero-text{flex:1 1 260px;min-width:0;}
+.lola-hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:24px;width:100%;}
+.lola-hero-text{min-width:0;grid-column:1;grid-row:1;}
 .lola-eyebrow{display:flex;align-items:center;gap:6px;color:var(--violet-light);font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;opacity:.9;margin-bottom:6px;}
 .lola-hero h1{color:var(--paper);}
 .lola-hero .chart-sub{color:var(--sub);}
-.lola-avatar-wrap{flex:0 0 auto;width:220px;height:330px;border-radius:24px;overflow:hidden;border:2px solid rgba(185,169,255,.45);box-shadow:0 0 30px -6px rgba(139,127,232,.6);}
-.lola-avatar-wrap img{width:100%;height:100%;object-fit:cover;object-position:top center;}
+.lola-avatar-wrap{grid-column:2;grid-row:1;justify-self:center;align-self:center;width:280px;height:280px;border-radius:50%;overflow:hidden;border:2px solid rgba(185,169,255,.45);box-shadow:0 0 30px -6px rgba(139,127,232,.6);display:flex;align-items:center;justify-content:center;background:rgba(10,10,10,.22);}
+.lola-avatar-wrap img{width:100%;height:100%;object-fit:contain;object-position:center center;display:block;}
 .lola-talk-btn{margin-top:12px;display:inline-flex;align-items:center;gap:8px;background:linear-gradient(160deg, var(--violet), var(--violet-dark));color:var(--paper);border:1px solid rgba(185,169,255,.4);padding:8px 16px;border-radius:999px;font-family:var(--font-display);font-size:12.5px;font-weight:600;cursor:pointer;transition:transform .2s var(--ease),box-shadow .2s;}
 .lola-talk-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px -6px rgba(139,127,232,.7);}
 .chart.lola-hero .badge{border-color:rgba(185,169,255,.35);color:var(--violet-light);background:rgba(139,127,232,.08);}
-@media (max-width:520px){.lola-avatar-wrap{width:150px;height:225px;}}
+@media (max-width:700px){.lola-hero-grid{grid-template-columns:1fr;}.lola-hero-text{grid-column:1;grid-row:2;text-align:center;}.lola-avatar-wrap{grid-column:1;grid-row:1;width:240px;height:240px;justify-self:center;}}
 .chart-eyebrow{color:var(--ice);font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;opacity:.85;}
 h1{font-size:20px;margin:6px 0 4px;font-weight:700;letter-spacing:-.01em;}
 .chart-sub{color:var(--sub);font-size:12px;margin:0;max-width:520px;}
@@ -563,7 +563,17 @@ footer{color:var(--sub);font-size:12px;text-align:center;margin-top:34px;}
 .ex-hist-sets{flex:1;color:var(--sub);}
 .ex-hist-max{color:var(--paper);font-weight:600;flex-shrink:0;}
 .ex-hist-btn{margin-inline-start:2px;width:26px;height:26px;font-size:11px;}
+.hm-year-nav{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:6px;}
+.hm-year-nav button{background:none;border:1px solid var(--line-strong);color:var(--sub);width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:13px;flex-shrink:0;transition:transform .1s var(--ease),color .25s var(--ease),border-color .25s;}
+.hm-year-nav button:hover{color:var(--paper);border-color:var(--ice);}
+.hm-year-nav button:active{transform:scale(.92);}
+.hm-year-nav button:disabled{opacity:.3;cursor:default;}
+.hm-year-nav button:disabled:hover{color:var(--sub);border-color:var(--line-strong);}
+.hm-year-nav .hm-year-label{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;color:var(--paper);min-width:52px;text-align:center;}
 .hm-year-wrap{overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;}
+.hm-year-months{display:flex;gap:3px;width:max-content;padding:0 2px;height:13px;}
+.hm-year-month-col{width:10px;flex:0 0 10px;position:relative;}
+.hm-year-month-col span{position:absolute;top:0;right:0;font-size:9px;color:var(--sub);white-space:nowrap;line-height:1;}
 .hm-year-grid{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,10px);gap:3px;width:max-content;padding:2px;}
 .hm-year-cell{width:10px;height:10px;border-radius:2.5px;background:transparent;border:1px solid var(--line);opacity:0;transform:scale(.6);animation:hmCellIn .22s var(--ease) both;}
 .hm-year-cell.hyc-done{background:var(--ok);border-color:var(--ok);}
@@ -1320,7 +1330,15 @@ footer{color:var(--sub);font-size:12px;text-align:center;margin-top:34px;}
     <div class="hm-section-title">ملاحظات وأنماط 🤍</div>
     <div id="hm-insights"></div>
     <div class="hm-section-title">خريطة السنة</div>
-    <div class="hm-year-wrap"><div class="hm-year-grid" id="hm-year-heatmap"></div></div>
+    <div class="hm-year-nav">
+      <button type="button" id="hm-year-prev" aria-label="السنة اللي فاتت">‹</button>
+      <span class="hm-year-label mono" id="hm-year-label"></span>
+      <button type="button" id="hm-year-next" aria-label="السنة الجاية">›</button>
+    </div>
+    <div class="hm-year-wrap">
+      <div class="hm-year-months" id="hm-year-months"></div>
+      <div class="hm-year-grid" id="hm-year-heatmap"></div>
+    </div>
     <div class="hm-year-legend" id="hm-year-legend"></div>
     <div class="hm-section-title">آخر أسبوعين</div>
     <div class="hm-weekday-header" id="hm-weekday-header"></div>
@@ -1500,6 +1518,7 @@ function todayKey(d=new Date()){
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 }
 const DAY_NAMES = ['أحد','اثنين','ثلاثاء','أربعاء','خميس','جمعة','سبت'];
+const MONTH_NAMES_EN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
 /* ======================= TABS ======================= */
 const TAB_ORDER = ['meals','calc','track','gym','journal'];
@@ -2286,9 +2305,11 @@ function renderDnrPhaseBox(days){
 }
 
 let currentHistoryHabit = null;
+let hmYearViewYear = new Date().getFullYear();
 
 function openHabitHistory(habitId){
   currentHistoryHabit = habitId;
+  hmYearViewYear = new Date().getFullYear();
   renderHabitHistory(habitId);
   const overlay = document.getElementById('hm-overlay');
   overlay.classList.add('show');
@@ -2340,33 +2361,7 @@ function renderHabitHistory(habitId){
     <div class="hm-badge ${trendCls}"><div class="v mono">${trendTxt}</div><div class="l">آخر أسبوع مقابل اللي فات</div></div>
   `;
 
-  // خريطة السنة: شبكة GitHub-style بتغطي آخر ~371 يوم (53 أسبوع)، كل عمود
-  // أسبوع وكل صف يوم في الأسبوع — بتديك نظرة عامة على السنة كلها بضغطة عين
-  // واحدة، من غير ما تحتاج تعد يوم يوم. عمود واحد لكل أسبوع من الأحد.
-  const todayForYear = new Date();
-  const yearSunday = new Date(todayForYear); yearSunday.setDate(todayForYear.getDate()-todayForYear.getDay());
-  const yearGridStart = new Date(yearSunday); yearGridStart.setDate(yearSunday.getDate()-7*52);
-  let yearCellsHtml = '';
-  for(let i=0;i<7*53;i++){
-    const d = new Date(yearGridStart); d.setDate(yearGridStart.getDate()+i);
-    const dk = todayKey(d);
-    const isFuture = d > todayForYear;
-    const status = isFuture ? null : cfg.getStatus(dk);
-    const cls = isFuture ? 'hyc-future' : ('hyc-' + (status || 'unlogged'));
-    const title = isFuture ? '' : (dk + ' — ' + cfg.labels[status||'unlogged']);
-    yearCellsHtml += `<div class="hm-year-cell ${cls}" title="${title}"></div>`;
-  }
-  const yearHeatmapEl = document.getElementById('hm-year-heatmap');
-  yearHeatmapEl.innerHTML = yearCellsHtml;
-  yearHeatmapEl.querySelectorAll('.hm-year-cell').forEach((cell,i)=>{ cell.style.animationDelay = (Math.floor(i/7)*7) + 'ms'; });
-  // يفتح على آخر جزء من السنة (النهاردة) بدل ما يبدأ من أقدم يوم
-  requestAnimationFrame(()=>{ const w = yearHeatmapEl.closest('.hm-year-wrap'); if(w) w.scrollLeft = w.scrollWidth; });
-
-  const yearStateOrder = habitId === 'gym' ? ['done','skipped','rest'] : ['done','skipped'];
-  const yearColorVar = s => s==='done' ? '--ok' : (s==='skipped' ? '--crimson' : '--blue-light');
-  document.getElementById('hm-year-legend').innerHTML =
-    yearStateOrder.map(s=>`<span><i style="background:var(${yearColorVar(s)})"></i>${cfg.labels[s]}</span>`).join('')
-    + `<span><i style="background:transparent;border:1.5px dashed var(--line);"></i>${cfg.labels.unlogged}</span>`;
+  renderYearHeatmap(cfg, habitId);
 
   // heatmap: أسبوعين كاملين (14 يوم)، محاذيين على بداية الأسبوع بالأحد
   // زي تقويم التتبع بالظبط — أقدم أسبوع فوق، النهاردة في آخر خانة تحت.
@@ -2417,6 +2412,71 @@ function renderHabitHistory(habitId){
       <span class="wpct mono">${w.pct!=null ? w.pct+'%' : '—'}</span>
     </div>`;
   }).join('');
+}
+
+// خريطة السنة: شبكة GitHub-style بتغطي السنة الميلادية كاملة (يناير لديسمبر)
+// اللي أنت مختارها بالـ prev/next، مع اسم كل شهر فوق أول عمود بتاعه —
+// مش آخر ٣٧١ يوم بس. تقدر تتنقل لأي سنة فاتت أو جاية من غير ما تفقد
+// وصولك للبيانات القديمة أو تستنى للسنة الجديدة عشان تشوف اللي جاي.
+function renderYearHeatmap(cfg, habitId){
+  const realToday = new Date();
+  const year = hmYearViewYear;
+
+  document.getElementById('hm-year-label').textContent = year;
+  document.getElementById('hm-year-prev').disabled = false;
+  document.getElementById('hm-year-next').disabled = false;
+
+  const jan1 = new Date(year, 0, 1);
+  const dec31 = new Date(year, 11, 31);
+  const gridStart = new Date(jan1); gridStart.setDate(jan1.getDate()-jan1.getDay());
+  const gridEnd = new Date(dec31); gridEnd.setDate(dec31.getDate()+(6-dec31.getDay()));
+  const totalDays = Math.round((gridEnd-gridStart)/86400000)+1;
+  const totalWeeks = totalDays/7;
+
+  let yearCellsHtml = '';
+  let todayCellIndex = -1;
+  const weekMonthLabel = new Array(totalWeeks).fill(null);
+  for(let i=0;i<totalDays;i++){
+    const d = new Date(gridStart); d.setDate(gridStart.getDate()+i);
+    const dk = todayKey(d);
+    const inYear = d.getFullYear()===year;
+    const isFuture = d > realToday;
+    const isTodayCell = dk === todayKey(realToday);
+    if(isTodayCell) todayCellIndex = Math.floor(i/7);
+    const status = (isFuture || !inYear) ? null : cfg.getStatus(dk);
+    const cls = (isFuture || !inYear) ? 'hyc-future' : ('hyc-' + (status || 'unlogged'));
+    const title = (isFuture || !inYear) ? '' : (dk + ' — ' + cfg.labels[status||'unlogged']);
+    yearCellsHtml += `<div class="hm-year-cell ${cls}" title="${title}" data-datekey="${dk}"></div>`;
+    if(inYear && d.getDate()===1){
+      const wk = Math.floor(i/7);
+      if(weekMonthLabel[wk]===null) weekMonthLabel[wk] = d.getMonth();
+    }
+  }
+  const yearHeatmapEl = document.getElementById('hm-year-heatmap');
+  yearHeatmapEl.innerHTML = yearCellsHtml;
+  yearHeatmapEl.querySelectorAll('.hm-year-cell').forEach((cell,i)=>{ cell.style.animationDelay = (Math.floor(i/7)*7) + 'ms'; });
+
+  document.getElementById('hm-year-months').innerHTML = weekMonthLabel.map(m=>
+    `<div class="hm-year-month-col">${m!==null ? `<span>${MONTH_NAMES_EN[m]}</span>` : ''}</div>`
+  ).join('');
+
+  // لو السنة المعروضة هي السنة الحالية، يفتح على النهاردة بدل ما يبدأ من يناير
+  requestAnimationFrame(()=>{
+    const w = yearHeatmapEl.closest('.hm-year-wrap');
+    if(!w) return;
+    if(todayCellIndex >= 0){
+      const targetCell = yearHeatmapEl.children[todayCellIndex*7];
+      if(targetCell) targetCell.scrollIntoView({inline:'center', block:'nearest'});
+    } else {
+      w.scrollLeft = 0;
+    }
+  });
+
+  const yearStateOrder = habitId === 'gym' ? ['done','skipped','rest'] : ['done','skipped'];
+  const yearColorVar = s => s==='done' ? '--ok' : (s==='skipped' ? '--crimson' : '--blue-light');
+  document.getElementById('hm-year-legend').innerHTML =
+    yearStateOrder.map(s=>`<span><i style="background:var(${yearColorVar(s)})"></i>${cfg.labels[s]}</span>`).join('')
+    + `<span><i style="background:transparent;border:1.5px dashed var(--line);"></i>${cfg.labels.unlogged}</span>`;
 }
 
 // بتولّد ملاحظات حقيقية مبنية على البيانات (مش كلام عام): اتجاه آخر أسبوع،
@@ -2479,6 +2539,14 @@ function computeHabitInsights(habitId){
   return lines;
 }
 
+document.getElementById('hm-year-prev').addEventListener('click', ()=>{
+  hmYearViewYear -= 1;
+  renderYearHeatmap(HABIT_HISTORY_CONFIG[currentHistoryHabit], currentHistoryHabit);
+});
+document.getElementById('hm-year-next').addEventListener('click', ()=>{
+  hmYearViewYear += 1;
+  renderYearHeatmap(HABIT_HISTORY_CONFIG[currentHistoryHabit], currentHistoryHabit);
+});
 document.getElementById('hm-close').addEventListener('click', closeHabitHistory);
 document.getElementById('hm-overlay').addEventListener('click', (e)=>{
   if(e.target.id === 'hm-overlay') closeHabitHistory();
