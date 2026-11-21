@@ -10,50 +10,81 @@
 const webpush = require('web-push');
 const admin = require('firebase-admin');
 
-// نفس ترتيب وأسماء أيام الجيم الموجودة في index.html (GYM_DAY_ORDER / GYM_DAYS).
-// لو عدّلت الأسماء هناك، لازم تعدّلها هنا برضو عشان الرسالة تفضل مطابقة.
-const GYM_DAY_LABELS = {
-  push:  'PUSH (صدر - تراي)',
-  pull:  'PULL (ضهر - باي - كتف)',
-  legs:  'LEGS (رجلين)',
+// أسماء الجلسات — لازم تفضل مطابقة لـ GYM_DAYS في index.html (upper / lower).
+// الجدول نفسه بييجي من Firestore: store.gym.schedule = { 'YYYY-MM-DD': 'upper'|'lower' }
+// (بتحدده انت كل أسبوع من تاب الجيم)، وstore.gym.dailyLog بيقول اتسجّل إيه النهاردة.
+const GYM_TYPE_LABELS = {
   upper: 'UPPER (الجزء العلوي كامل)',
   lower: 'LOWER (رجلين + كور)'
 };
-const GYM_REST_DAYS = ['rest1', 'rest2'];
 
-// بيتحدد وقته وكل تفاصيله وقت التشغيل (مش هنا ثابت) لأنه محتاج يقرأ
-// store.gym.day الأول عشان يعرف يقول إيه بالظبط.
+// أدوات تواريخ بصيغة 'YYYY-MM-DD' (تاريخ القاهرة) من غير ما نعتمد على timezone السيرفر.
+function dateStrAddDays(str, n){
+  const [y, m, d] = str.split('-').map(Number);
+  const dt = new Date(Date.UTC(y, m - 1, d + n));
+  return `${dt.getUTCFullYear()}-${String(dt.getUTCMonth() + 1).padStart(2, '0')}-${String(dt.getUTCDate()).padStart(2, '0')}`;
+}
+function dateStrDow(str){ // 0=أحد ... 6=سبت
+  const [y, m, d] = str.split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1, d)).getUTCDay();
+}
+// الأسبوع بيبدأ سبت (نفس index.html).
+function weekDatesFor(str){
+  const start = dateStrAddDays(str, -((dateStrDow(str) + 1) % 7));
+  return Array.from({ length: 7 }, (_, i) => dateStrAddDays(start, i));
+}
+
+// بيتحدد وقته وتفاصيله وقت التشغيل لأنه بيقرا جدول الأسبوع من Firestore.
+//   - النهاردة فيه UPPER/LOWER مجدول → تنبيه 12 بالليل + تذكير 6 مساءً
+//     (التذكير بيتلغي لو سجّلت التمرين أو "مش هلعب" قبلها).
+//   - مفيش تمرين النهاردة بس الأسبوع ده متحدد → رسالة راحة 12 بالليل.
+//   - الأسبوع كله فاضي (لسه ما حددتش) → يوم السبت الساعة 12 الضهر تنبيه
+//     "حدد جدول الأسبوع". باقي الأيام ساكتة عشان متزعجش لو أسبوع من غير جيم.
 //
-// ملحوظة عن الرابط: بنستخدم './?tab=gym' (نسبي) مش '/?tab=gym' (مطلق) —
-// لو استخدمنا مطلق هيرجع نفس مشكلة الـ 404 اللي حصلت قبل كده على GitHub
-// Pages project pages (اللي بتكون تحت مسار فرعي زي /repo-name/ مش جذر
-// الدومين). sw.js بيحل الرابط النسبي ده بالنسبة لمكانه هو، فبيوصل صح.
-function buildGymReminders(store){
-  const day = store.gym && store.gym.day;
-  const isRest = GYM_REST_DAYS.includes(day);
-  if(isRest){
-    // يوم راحة: تنبيه الـ12 بالليل بس (مفيش داعي نفكّره الساعة 6 بتمرين مش موجود).
+// ملحوظة عن الرابط: './?tab=gym' (نسبي) مش '/?tab=gym' — عشان GitHub Pages
+// project pages (sw.js بيحل النسبي بالنسبة لمكانه).
+function buildGymReminders(store, today){
+  const gym = store.gym || {};
+  const schedule = gym.schedule || {};
+  const log = gym.dailyLog || {};
+  const type = schedule[today];
+  const status = log[today];
+
+  if(type && GYM_TYPE_LABELS[type]){
+    const bodyLabel = `تمرين ${GYM_TYPE_LABELS[type]}`;
+    const out = [
+      {
+        id:'gym_day', hour:0, minute:0,
+        title:'Lola — يلا بينا 💪',
+        body: `فاكرك جاهز لـ${bodyLabel} النهاردة — خد بالك من نفسك وانت بتلعب.`,
+        url:'./?tab=gym'
+      }
+    ];
+    if(!status){
+      out.push({
+        id:'gym_evening', hour:18, minute:0,
+        title:'Lola — لسه فيه وقت 💪',
+        body: `لو لسه مسجّلتش ${bodyLabel}، اليوم لسه فيه وقت.`,
+        url:'./?tab=gym'
+      });
+    }
+    return out;
+  }
+
+  const weekHasPlan = weekDatesFor(today).some(k => schedule[k]);
+  if(weekHasPlan){
+    // يوم راحة في أسبوع متحدد.
     return [
       { id:'gym_day', hour:0, minute:0, title:'Lola — خد راحتك النهاردة 🌙', body:'النهاردة يوم راحة في جدولك، مفيش داعي تحمّل جسمك أكتر من طاقته. ارتاح وانت مرتاح البال.' }
     ];
   }
-  const label = GYM_DAY_LABELS[day];
-  const bodyLabel = label ? `تمرين ${label}` : 'تمرين النهاردة';
-  return [
-    {
-      id:'gym_day', hour:0, minute:0,
-      title:'Lola — يلا بينا 💪',
-      body: `فاكرك جاهز لـ${bodyLabel} النهاردة — خد بالك من نفسك وانت بتلعب.`,
-      url:'./?tab=gym'
-    },
-    {
-      // نفس تمرين اليوم، تذكير تاني الساعة 6 مساءً قبل ما اليوم يخلص.
-      id:'gym_evening', hour:18, minute:0,
-      title:'Lola — لسه فيه وقت 💪',
-      body: `لو لسه مسجّلتش ${bodyLabel}، اليوم لسه فيه وقت. وإن كنت خلصت بالفعل، عاش يا وحش 🙌`,
-      url:'./?tab=gym'
-    }
-  ];
+
+  if(dateStrDow(today) === 6){
+    return [
+      { id:'gym_plan', hour:12, minute:0, title:'Lola — جدول الأسبوع 📅', body:'أسبوع جديد بدأ — حدد أيام UPPER و LOWER بتوعك من تاب الجيم عشان أفكرك في معادهم.', url:'./?tab=gym' }
+    ];
+  }
+  return [];
 }
 
 const REMINDERS = [
@@ -198,7 +229,7 @@ async function main(){
   // كامل (1440 دقيقة). الـ % 1440 هنا بيصلح المشكلة في كل الحالات.
   const cairoMinutesOfDay = ((+cairoParts.hour)*60 + (+cairoParts.minute)) % 1440;
 
-  const allReminders = [...REMINDERS, ...buildGymReminders(store)];
+  const allReminders = [...REMINDERS, ...buildGymReminders(store, cairoDateStr)];
 
   const testId = (process.env.TEST_REMINDER_ID || '').trim();
 
